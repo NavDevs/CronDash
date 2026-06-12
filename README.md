@@ -333,6 +333,17 @@ RESEND_FROM_EMAIL="alerts@crondash.com"
 | `npm run build` | Build for production |
 | `npm run start` | Start production server |
 | `npm run lint` | Run ESLint |
+| `npm run migrate-passwords` | Hash existing plaintext passwords with bcrypt |
+
+### Database Migration (Passwords)
+
+If you have existing users created before bcrypt was implemented, run:
+
+```bash
+npm run migrate-passwords
+```
+
+This hashes all plaintext passwords using bcrypt with 12 salt rounds. Already-hashed passwords are skipped.
 
 ### Docker Deployment
 
