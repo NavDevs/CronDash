@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Card } from '@/components/ui/Card';
 import { ProfileMenu } from '@/components/ui/ProfileMenu';
+import { TestEndpoint } from '@/components/TestEndpoint';
 import { validateCronExpression, CRON_PRESETS } from '@/lib/cron-utils';
 
 export default function CreateJobPage() {
@@ -265,6 +266,13 @@ export default function CreateJobPage() {
                   />
                 </div>
               </div>
+
+              <TestEndpoint
+                url={form.url}
+                method={form.method}
+                headers={form.headers}
+                body={form.body}
+              />
 
               {error && (
                 <div className="font-mono text-sm text-error">
