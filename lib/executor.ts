@@ -1,5 +1,6 @@
 import axios from "axios"
 import { prisma } from "@/lib/prisma"
+import { sendAlerts } from "./alerts"
 
 export async function executeJob(jobId: string) {
   // fetch job from DB
@@ -21,6 +22,7 @@ export async function executeJob(jobId: string) {
     })
 
     const duration = Date.now() - startTime
+    const executedAt = new Date()
 
     // save successful run
     await prisma.jobRun.create({
@@ -30,17 +32,19 @@ export async function executeJob(jobId: string) {
         statusCode: response.status,
         duration,
         response: JSON.stringify(response.data).slice(0, 500),
+        executedAt,
       },
     })
 
     // update lastRun on job
     await prisma.job.update({
       where: { id: job.id },
-      data: { lastRun: new Date() },
+      data: { lastRun: executedAt },
     })
 
   } catch (error: any) {
     const duration = Date.now() - startTime
+    const executedAt = new Date()
 
     // save failed run
     await prisma.jobRun.create({
@@ -53,13 +57,25 @@ export async function executeJob(jobId: string) {
         response: error?.response?.data
           ? JSON.stringify(error.response.data).slice(0, 500)
           : null,
+        executedAt,
       },
     })
 
     // update lastRun on job
     await prisma.job.update({
       where: { id: job.id },
-      data: { lastRun: new Date() },
+      data: { lastRun: executedAt },
+    })
+
+    // Send alerts on failure
+    await sendAlerts(job.id, {
+      jobId: job.id,
+      jobName: job.name,
+      status: "failed",
+      statusCode: error?.response?.status,
+      error: error?.message || "Unknown error",
+      duration,
+      executedAt,
     })
   }
 }
