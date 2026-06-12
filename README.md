@@ -33,6 +33,7 @@ CronDash is a web-based cron job management system that allows users to:
 | Scheduler | node-cron (in-process) |
 | HTTP Client | axios |
 | Email | Resend |
+| Deployment | Docker |
 | Fonts | JetBrains Mono (Google Fonts) |
 
 ---
@@ -336,6 +337,28 @@ RESEND_FROM_EMAIL="alerts@crondash.com"
 | `npm run start` | Start production server |
 | `npm run lint` | Run ESLint |
 
+### Docker Deployment
+
+```bash
+# Build and start with Docker Compose
+docker compose up -d
+
+# Or build manually
+docker build -t crondash .
+docker run -d \
+  -p 3000:3000 \
+  -e SESSION_SECRET="your-secret-key" \
+  -e DATABASE_URL="file:./prisma/dev.db" \
+  -v crondash-data:/app/prisma \
+  crondash
+```
+
+The SQLite database is persisted in a Docker volume (`crondash-data`). On first startup, run `npx prisma db push` inside the container to initialize the database:
+
+```bash
+docker compose exec crondash npx prisma db push
+```
+
 ---
 
 ## UI Design System
@@ -365,6 +388,7 @@ CronDash uses a **terminal/hacker aesthetic** with:
 - [x] Slack webhook failure notifications
 - [x] Email failure notifications via Resend
 - [x] External cron endpoint with API key auth
+- [x] Docker deployment with persistent SQLite volume
 
 ---
 
