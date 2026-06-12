@@ -1,0 +1,54 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id @default(cuid())
+  email         String   @unique
+  password      String
+  slackWebhook  String?
+  alertEmail    String?
+  apiKey        String   @unique @default(cuid())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  jobs          Job[]
+}
+
+model Job {
+  id          String    @id @default(cuid())
+  name        String
+  url         String
+  method      String    @default("GET")
+  headers     String?
+  body        String?
+  schedule    String
+  enabled     Boolean   @default(true)
+  lastRun     DateTime?
+  nextRun     DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  runs        JobRun[]
+}
+
+model JobRun {
+  id           String   @id @default(cuid())
+  status       String   // "success" | "failed" | "running"
+  statusCode   Int?
+  duration     Int?     // milliseconds
+  response     String?  // response body snippet
+  error        String?  // error message if failed
+  executedAt   DateTime @default(now())
+
+  jobId        String
+  job          Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
+}
