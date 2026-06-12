@@ -12,6 +12,9 @@ const jetbrainsMono = JetBrains_Mono({
 export const metadata: Metadata = {
   title: "CronDash - Visual Cron Job Manager",
   description: "Manage your cron jobs with a terminal-style interface",
+  icons: {
+    icon: "/favicon.ico",
+  },
 };
 
 export default function RootLayout({
