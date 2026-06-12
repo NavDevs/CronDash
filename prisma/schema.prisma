@@ -9,9 +9,8 @@ datasource db {
 }
 
 model User {
-  id            String   @id @default(cuid())
+  id            String   @id
   email         String   @unique
-  password      String?
   slackWebhook  String?
   webhookUrl    String?
   alertEmail    String?
@@ -44,11 +43,11 @@ model Job {
 
 model JobRun {
   id           String   @id @default(cuid())
-  status       String   // "success" | "failed" | "running"
+  status       String
   statusCode   Int?
-  duration     Int?     // milliseconds
-  response     String?  // response body snippet
-  error        String?  // error message if failed
+  duration     Int?
+  response     String?
+  error        String?
   executedAt   DateTime @default(now())
 
   jobId        String

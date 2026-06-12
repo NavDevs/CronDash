@@ -1,52 +1,30 @@
 import { NextResponse } from "next/server"
-import { cookies } from "next/headers"
 import { prisma } from "@/lib/prisma"
 import { scheduleJob } from "@/lib/scheduler"
+import { requireUserId } from "@/lib/clerk-auth"
 
-// GET all jobs for logged-in user
 export async function GET() {
   try {
-    const cookieStore = await cookies()
-    const sessionCookie = cookieStore.get("crondash-session")
-    
-    if (!sessionCookie?.value) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-    }
-
-    const session = JSON.parse(Buffer.from(sessionCookie.value, "base64").toString())
-    
-    if (!session.userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-    }
+    const userId = await requireUserId()
 
     const jobs = await prisma.job.findMany({
-      where: { userId: session.userId },
+      where: { userId },
       orderBy: { createdAt: "desc" },
+      include: { runs: { orderBy: { executedAt: "desc" }, take: 1 } },
     })
 
     return NextResponse.json(jobs)
   } catch (error: any) {
-    console.error("GET jobs error:", error)
+    if (error.message === "Unauthorized") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }
 
-// POST create a new job
 export async function POST(req: Request) {
   try {
-    const cookieStore = await cookies()
-    const sessionCookie = cookieStore.get("crondash-session")
-    
-    if (!sessionCookie?.value) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-    }
-
-    const session = JSON.parse(Buffer.from(sessionCookie.value, "base64").toString())
-    
-    if (!session.userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-    }
-
+    const userId = await requireUserId()
     const body = await req.json()
     const { name, url, method, headers, body: requestBody, schedule } = body
 
@@ -65,7 +43,7 @@ export async function POST(req: Request) {
         headers: headers ? JSON.stringify(headers) : null,
         body: requestBody ? JSON.stringify(requestBody) : null,
         schedule,
-        userId: session.userId,
+        userId,
       },
     })
 
@@ -73,7 +51,9 @@ export async function POST(req: Request) {
 
     return NextResponse.json(job, { status: 201 })
   } catch (error: any) {
-    console.error("POST jobs error:", error)
+    if (error.message === "Unauthorized") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }

@@ -1,44 +1,29 @@
 import { notFound, redirect } from "next/navigation"
 import Link from "next/link"
-import { cookies } from "next/headers"
+import { auth } from "@clerk/nextjs/server"
 import { prisma } from "@/lib/prisma"
-import { Button } from "@/components/ui/Button"
 import { Card } from "@/components/ui/Card"
 import { StatusIndicator } from "@/components/ui/StatusIndicator"
 import { ProfileMenu } from "@/components/ui/ProfileMenu"
 import { JobActions } from "./JobActions"
-import { LogModal } from "@/components/LogModal"
 import { RunHistory } from "./RunHistory"
 
-export const dynamic = "force-dynamic";
-
-async function getSession() {
-  const cookieStore = await cookies()
-  const sessionCookie = cookieStore.get("crondash-session")
-  
-  if (!sessionCookie?.value) return null
-  
-  try {
-    return JSON.parse(Buffer.from(sessionCookie.value, "base64").toString())
-  } catch {
-    return null
-  }
-}
+export const dynamic = "force-dynamic"
 
 export default async function JobDetailPage({
   params,
 }: {
   params: { id: string }
 }) {
-  const session = await getSession()
-  
-  if (!session?.userId) {
+  const { userId } = await auth()
+
+  if (!userId) {
     redirect("/login")
   }
 
   const job = await prisma.job.findFirst({
-    where: { id: params.id, userId: session.userId },
-    include: { runs: { orderBy: { executedAt: 'desc' }, take: 50 } },
+    where: { id: params.id, userId },
+    include: { runs: { orderBy: { executedAt: "desc" }, take: 50 } },
   })
 
   if (!job) {
@@ -117,14 +102,12 @@ export default async function JobDetailPage({
                 </div>
                 <div className="flex justify-between">
                   <span className="text-primary">STATUS:</span>
-                  <StatusIndicator 
-                    status={job.enabled ? 'success' : 'pending'} 
-                  />
+                  <StatusIndicator status={job.enabled ? "success" : "pending"} />
                 </div>
                 <div className="flex justify-between">
                   <span className="text-primary">ENABLED:</span>
-                  <span className={job.enabled ? 'text-primary' : 'text-error'}>
-                    {job.enabled ? '[YES]' : '[NO]'}
+                  <span className={job.enabled ? "text-primary" : "text-error"}>
+                    {job.enabled ? "[YES]" : "[NO]"}
                   </span>
                 </div>
               </div>
@@ -135,13 +118,13 @@ export default async function JobDetailPage({
                 <div className="flex justify-between">
                   <span className="text-primary">NEXT RUN:</span>
                   <span className="text-primary">
-                    {job.nextRun ? new Date(job.nextRun).toLocaleString() : 'N/A'}
+                    {job.nextRun ? new Date(job.nextRun).toLocaleString() : "N/A"}
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-primary">LAST RUN:</span>
                   <span className="text-primary">
-                    {job.lastRun ? new Date(job.lastRun).toLocaleString() : 'N/A'}
+                    {job.lastRun ? new Date(job.lastRun).toLocaleString() : "N/A"}
                   </span>
                 </div>
                 <JobActions jobId={job.id} enabled={job.enabled} />
@@ -155,16 +138,25 @@ export default async function JobDetailPage({
                 [INFO] NO RUN HISTORY YET. Click RUN NOW to trigger manually.
               </div>
             ) : (
-              <RunHistory runs={job.runs.map(r => ({ ...r, executedAt: r.executedAt, response: r.response, error: r.error }))} />
+              <RunHistory
+                runs={job.runs.map((r) => ({
+                  ...r,
+                  executedAt: r.executedAt,
+                  response: r.response,
+                  error: r.error,
+                }))}
+              />
             )}
           </Card>
 
           <Card title="LATEST LOGS">
-            <pre className={`
+            <pre
+              className={`
               ${latestRun?.error ? "text-error" : "text-primary"}
               font-mono text-xs border border-primary/50 p-4
               overflow-auto max-h-[200px] whitespace-pre-wrap break-all bg-background m-0
-            `}>
+            `}
+            >
               {formatLatestLog()}
             </pre>
           </Card>
@@ -178,5 +170,5 @@ export default async function JobDetailPage({
         </div>
       </footer>
     </div>
-  );
+  )
 }

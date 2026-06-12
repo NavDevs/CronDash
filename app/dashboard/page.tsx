@@ -1,68 +1,48 @@
-import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
-import Link from "next/link";
-import { prisma } from "@/lib/prisma";
-import { Button } from "@/components/ui/Button";
-import { Card } from "@/components/ui/Card";
-import { ProfileMenu } from "@/components/ui/ProfileMenu";
-import { JobTable } from "./JobTable";
+import { auth } from "@clerk/nextjs/server"
+import { redirect } from "next/navigation"
+import Link from "next/link"
+import { prisma } from "@/lib/prisma"
+import { Button } from "@/components/ui/Button"
+import { Card } from "@/components/ui/Card"
+import { ProfileMenu } from "@/components/ui/ProfileMenu"
+import { JobTable } from "./JobTable"
 
-export const dynamic = "force-dynamic";
-
-async function getSession() {
-  const cookieStore = await cookies();
-  const sessionCookie = cookieStore.get("crondash-session");
-  
-  if (!sessionCookie?.value) return null;
-  
-  try {
-    const session = JSON.parse(Buffer.from(sessionCookie.value, "base64").toString());
-    return session;
-  } catch {
-    return null;
-  }
-}
+export const dynamic = "force-dynamic"
 
 export default async function DashboardPage() {
-  const session = await getSession();
+  const { userId } = await auth()
 
-  if (!session?.userId) {
-    redirect("/login");
+  if (!userId) {
+    redirect("/login")
   }
 
-  const userEmail = session.email;
+  let jobs: any[] = []
+  let totalJobs = 0
+  let activeJobs = 0
+  let disabledJobs = 0
+  let failedJobs = 0
+  let successCount = 0
 
-  let jobs: any[] = [];
-  let totalJobs = 0;
-  let activeJobs = 0;
-  let disabledJobs = 0;
-  let failedJobs = 0;
-  let successCount = 0;
-
-  if (userEmail) {
-    const user = await prisma.user.findUnique({
-      where: { email: userEmail },
-      include: { 
-        jobs: { 
-          orderBy: { createdAt: 'desc' },
-          include: { runs: { orderBy: { executedAt: 'desc' }, take: 1 } }
-        } 
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    include: {
+      jobs: {
+        orderBy: { createdAt: "desc" },
+        include: { runs: { orderBy: { executedAt: "desc" }, take: 1 } },
       },
-    });
+    },
+  })
 
-    if (user) {
-      jobs = user.jobs;
-      totalJobs = jobs.length;
-      activeJobs = jobs.filter((j: any) => j.enabled).length;
-      disabledJobs = jobs.filter((j: any) => !j.enabled).length;
-      failedJobs = jobs.filter((j: any) => j.runs[0]?.status === "failed").length;
-      successCount = jobs.filter((j: any) => j.runs[0]?.status === "success").length;
-    }
+  if (user) {
+    jobs = user.jobs
+    totalJobs = jobs.length
+    activeJobs = jobs.filter((j: any) => j.enabled).length
+    disabledJobs = jobs.filter((j: any) => !j.enabled).length
+    failedJobs = jobs.filter((j: any) => j.runs[0]?.status === "failed").length
+    successCount = jobs.filter((j: any) => j.runs[0]?.status === "success").length
   }
 
-  const successRate = totalJobs === 0
-    ? 100
-    : Math.round((successCount / totalJobs) * 100);
+  const successRate = totalJobs === 0 ? 100 : Math.round((successCount / totalJobs) * 100)
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -114,7 +94,7 @@ export default async function DashboardPage() {
 
           <div className="flex justify-between items-center">
             <div className="font-mono text-sm text-primary">
-              <span className="text-primary">[INFO]</span> {totalJobs === 0 ? 'GET STARTED BY CREATING YOUR FIRST JOB' : 'ALL SYSTEMS OPERATIONAL'}
+              <span className="text-primary">[INFO]</span> {totalJobs === 0 ? "GET STARTED BY CREATING YOUR FIRST JOB" : "ALL SYSTEMS OPERATIONAL"}
             </div>
             <Button variant="primary" href="/jobs/create">
               CREATE NEW JOB
@@ -130,5 +110,5 @@ export default async function DashboardPage() {
         </div>
       </footer>
     </div>
-  );
+  )
 }

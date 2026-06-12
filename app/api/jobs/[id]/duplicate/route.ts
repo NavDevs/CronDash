@@ -1,32 +1,18 @@
 import { NextResponse } from "next/server"
-import { cookies } from "next/headers"
 import { prisma } from "@/lib/prisma"
 import { scheduleJob } from "@/lib/scheduler"
-
-async function getSession() {
-  const cookieStore = await cookies()
-  const sessionCookie = cookieStore.get("crondash-session")
-  if (!sessionCookie?.value) return null
-  try {
-    return JSON.parse(Buffer.from(sessionCookie.value, "base64").toString())
-  } catch {
-    return null
-  }
-}
+import { requireUserId } from "@/lib/clerk-auth"
 
 export async function POST(
   _request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await getSession()
-    if (!session?.userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-    }
-
+    const userId = await requireUserId()
     const resolvedParams = await params
+
     const original = await prisma.job.findFirst({
-      where: { id: resolvedParams.id, userId: session.userId },
+      where: { id: resolvedParams.id, userId },
     })
 
     if (!original) {
@@ -42,7 +28,7 @@ export async function POST(
         body: original.body,
         schedule: original.schedule,
         enabled: false,
-        userId: session.userId,
+        userId,
       },
     })
 
@@ -52,7 +38,9 @@ export async function POST(
 
     return NextResponse.json(duplicate, { status: 201 })
   } catch (error: any) {
-    console.error("Duplicate job error:", error)
+    if (error.message === "Unauthorized") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }

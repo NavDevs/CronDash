@@ -1,185 +1,8 @@
 'use client';
 
-import { useState, Suspense } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import { SignIn } from '@clerk/nextjs';
 import { Logo } from '@/components/ui/Logo';
-import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
-import { Card } from '@/components/ui/Card';
-import { GoogleAuthButton } from '@/components/GoogleAuthButton';
-
-function LoginForm() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [retryAfter, setRetryAfter] = useState<number | null>(null);
-
-  // Validation errors
-  const [errors, setErrors] = useState<{
-    email?: string;
-    password?: string;
-  }>({});
-
-  function validateForm() {
-    const newErrors: typeof errors = {};
-
-    // Email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!email) {
-      newErrors.email = 'Email is required';
-    } else if (!emailRegex.test(email)) {
-      newErrors.email = 'Please enter a valid email address';
-    }
-
-    // Password validation
-    if (!password) {
-      newErrors.password = 'Password is required';
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  }
-
-  async function handleLogin(e: React.FormEvent) {
-    e.preventDefault();
-    setError('');
-    setRetryAfter(null);
-
-    if (!validateForm()) {
-      return;
-    }
-
-    setLoading(true);
-
-    try {
-      const res = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const contentType = res.headers.get('content-type');
-      if (!contentType?.includes('application/json')) {
-        throw new Error('Server error. Please restart the dev server.');
-      }
-
-      const data = await res.json();
-
-      // Check for rate limit
-      if (res.status === 429) {
-        setError(data.error || 'Too many login attempts');
-        if (data.retryAfter) {
-          setRetryAfter(data.retryAfter);
-        }
-        setLoading(false);
-        return;
-      }
-
-      if (!res.ok) {
-        setError(data.error || 'Login failed');
-        setLoading(false);
-        return;
-      }
-
-      // Logged in — redirect to dashboard or original page
-      const from = searchParams.get('from') || '/dashboard';
-      router.push(from);
-      router.refresh();
-    } catch (err: any) {
-      setError(err.message || 'Something went wrong');
-      setLoading(false);
-    }
-  }
-
-  return (
-    <form onSubmit={handleLogin} className="space-y-6">
-      <div className="space-y-4">
-        <div>
-          <Input
-            label="EMAIL"
-            prompt="user@crondash:~$"
-            type="email"
-            value={email}
-            onChange={(e) => {
-              setEmail(e.target.value);
-              setErrors({ ...errors, email: undefined });
-            }}
-            placeholder="enter your email"
-            required
-          />
-          {errors.email && (
-            <p className="font-mono text-xs text-error mt-1">[ERROR] {errors.email}</p>
-          )}
-        </div>
-
-        <div>
-          <Input
-            label="PASSWORD"
-            prompt="user@crondash:~$"
-            type="password"
-            value={password}
-            onChange={(e) => {
-              setPassword(e.target.value);
-              setErrors({ ...errors, password: undefined });
-            }}
-            placeholder="enter your password"
-            required
-          />
-          {errors.password && (
-            <p className="font-mono text-xs text-error mt-1">[ERROR] {errors.password}</p>
-          )}
-        </div>
-      </div>
-
-      {error && (
-        <div className="font-mono text-sm text-error">
-          [ERROR] {error}
-          {retryAfter && (
-            <span className="block mt-1 text-xs">
-              [INFO] Try again in {Math.ceil(retryAfter / 60)} minutes
-            </span>
-          )}
-        </div>
-      )}
-
-      <div className="flex items-center justify-between font-mono text-xs text-primary">
-        <label className="flex items-center gap-2 cursor-pointer">
-          <input type="checkbox" className="accent-primary" />
-          <span>REMEMBER ME</span>
-        </label>
-        <span className="hover:text-primary transition-colors cursor-pointer">
-          FORGOT PASSWORD?
-        </span>
-      </div>
-
-      <Button variant="primary" className="w-full" type="submit" disabled={loading}>
-        {loading ? 'AUTHENTICATING...' : 'LOGIN'}
-      </Button>
-
-      <div className="relative">
-        <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-border"></div>
-        </div>
-        <div className="relative flex justify-center text-xs font-mono">
-          <span className="bg-card px-2 text-primary">OR</span>
-        </div>
-      </div>
-
-      <GoogleAuthButton />
-
-      <div className="text-center font-mono text-sm text-primary">
-        <span>NEW USER? </span>
-        <Link href="/signup" className="text-primary hover:text-secondary transition-colors">
-          [ SIGN UP ]
-        </Link>
-      </div>
-    </form>
-  );
-}
 
 export default function LoginPage() {
   return (
@@ -204,11 +27,35 @@ export default function LoginPage() {
             <Logo />
           </div>
 
-          <Card title="AUTHENTICATION">
-            <Suspense fallback={<div className="font-mono text-sm text-primary">Loading...</div>}>
-              <LoginForm />
-            </Suspense>
-          </Card>
+          <div className="border border-border bg-background p-1">
+            <div className="border-b border-border px-4 py-2 bg-muted/20">
+              <span className="font-mono text-sm text-primary">+--- AUTHENTICATION ---+</span>
+            </div>
+            <div className="p-4">
+              <SignIn
+                routing="path"
+                path="/login"
+                signUpUrl="/signup"
+                appearance={{
+                  elements: {
+                    rootBox: "w-full",
+                    card: "bg-transparent border-0 shadow-none w-full",
+                    headerTitle: "font-mono text-primary text-sm",
+                    headerSubtitle: "font-mono text-primary text-xs",
+                    socialButtonsBlockButton: "font-mono text-sm border border-border bg-background text-primary hover:bg-muted/20 w-full",
+                    socialButtonsBlockButtonText: "font-mono text-sm text-primary",
+                    dividerLine: "bg-border",
+                    dividerText: "font-mono text-xs text-primary",
+                    formFieldLabel: "font-mono text-xs text-primary uppercase",
+                    formFieldInput: "font-mono text-sm bg-background border border-border text-primary",
+                    formButtonPrimary: "font-mono text-sm bg-primary text-background hover:bg-primary/90 w-full",
+                    footerActionLink: "font-mono text-xs text-primary hover:text-secondary",
+                    identityPreviewEditButton: "font-mono text-xs text-primary",
+                  },
+                }}
+              />
+            </div>
+          </div>
 
           <div className="text-center font-mono text-xs text-primary">
             <span className="text-primary">[INFO]</span> ENTER YOUR CREDENTIALS TO ACCESS THE DASHBOARD

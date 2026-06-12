@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { JetBrains_Mono } from "next/font/google";
+import { ClerkProvider } from "@clerk/nextjs";
 import "./globals.css";
 import { ToastContainer } from "@/components/Toast";
 
@@ -24,12 +25,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${jetbrainsMono.variable} h-full antialiased`}>
-      <body suppressHydrationWarning className="min-h-full flex flex-col">
-        {children}
-        <ToastContainer />
-        <div className="crt-overlay" />
-      </body>
-    </html>
+    <ClerkProvider>
+      <html lang="en" className={`${jetbrainsMono.variable} h-full antialiased`}>
+        <body suppressHydrationWarning className="min-h-full flex flex-col">
+          {children}
+          <ToastContainer />
+          <div className="crt-overlay" />
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }
