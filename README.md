@@ -55,8 +55,7 @@ CronDash/
 │   │   │   │   ├── run/      # POST /api/jobs/[id]/run (manual trigger)
 │   │   │   │   └── runs/     # GET /api/jobs/[id]/runs
 │   │   │   └── route.ts      # GET/POST (list + create)
-│   │   ├── init/             # POST /api/init (init scheduler)
-│   │   └── test/             # POST /api/test (test endpoint)
+│   │   └── test/             # POST /api/test (test endpoint + health check)
 │   ├── dashboard/           # Dashboard page (stats + job list)
 │   ├── jobs/                # Job management pages
 │   │   ├── [id]/            # Job detail page
@@ -74,10 +73,10 @@ CronDash/
 │   │   ├── Input.tsx        # Terminal-style input
 │   │   ├── Logo.tsx         # CronDash ASCII logo
 │   │   ├── ProfileMenu.tsx # User profile dropdown
-│   │   ├── ProgressBar.tsx # Progress indicator
 │   │   └── StatusIndicator.tsx # Status dot (success/pending/error)
+│   ├── Toast.tsx            # Toast notification system
 │   ├── LogModal.tsx         # Job run log viewer modal
-│   └── SchedulerInit.tsx    # Client-side scheduler initializer
+│   └── TestEndpoint.tsx     # Test endpoint button widget
 ├── lib/                     # Core business logic
 │   ├── prisma.ts            # Prisma client singleton
 │   ├── session.ts           # Session configuration
@@ -194,8 +193,8 @@ User Browser
 
 ### Job Scheduling Flow
 
-1. **Initialization** — `SchedulerInit` component calls `/api/init` on client mount
-2. **Load** — Server fetches all enabled jobs from DB
+1. **Initialization** — `initScheduler()` runs on server boot, loading all enabled jobs from DB
+2. **Scheduling** — Each job is registered with `node-cron` using its cron expression
 3. **Schedule** — Each job is registered with `node-cron` using its cron expression
 4. **Execute** — When a cron trigger fires, `executor.ts` runs the HTTP request
 5. **Log** — Results are saved to `JobRun` table with status, code, duration, response
@@ -249,7 +248,6 @@ User Browser
 
 | Endpoint | Method | Description |
 |----------|--------|-------------|
-| `/api/init` | POST | Initialize scheduler (load all jobs) |
 | `/api/cron` | GET | External cron trigger via API key |
 | `/api/test` | GET | Health check (Prisma connectivity) |
 
