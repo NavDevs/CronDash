@@ -8,21 +8,39 @@ import { Card } from '@/components/ui/Card';
 
 export default function Home() {
   const [typedText, setTypedText] = useState('');
-  const fullText = 'MANAGE YOUR CRON JOBS LIKE A PRO_';
+  const [lineIndex, setLineIndex] = useState(0);
+  const [charIndex, setCharIndex] = useState(0);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const lines = [
+    'MANAGE YOUR CRON JOBS LIKE A PRO',
+    'SCHEDULE. MONITOR. ALERT.',
+    'YOUR TERMINAL FOR CRON JOBS',
+  ];
 
   useEffect(() => {
-    let index = 0;
-    const timer = setInterval(() => {
-      if (index < fullText.length) {
-        setTypedText(fullText.slice(0, index + 1));
-        index++;
-      } else {
-        clearInterval(timer);
-      }
-    }, 100);
+    const currentLine = lines[lineIndex];
+    let timeout: ReturnType<typeof setTimeout>;
 
-    return () => clearInterval(timer);
-  }, []);
+    if (!isDeleting && charIndex < currentLine.length) {
+      timeout = setTimeout(() => {
+        setTypedText(currentLine.slice(0, charIndex + 1));
+        setCharIndex(charIndex + 1);
+      }, 80);
+    } else if (!isDeleting && charIndex === currentLine.length) {
+      timeout = setTimeout(() => setIsDeleting(true), 2000);
+    } else if (isDeleting && charIndex > 0) {
+      timeout = setTimeout(() => {
+        setTypedText(currentLine.slice(0, charIndex - 1));
+        setCharIndex(charIndex - 1);
+      }, 40);
+    } else if (isDeleting && charIndex === 0) {
+      setIsDeleting(false);
+      setLineIndex((lineIndex + 1) % lines.length);
+    }
+
+    return () => clearTimeout(timeout);
+  }, [charIndex, isDeleting, lineIndex]);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -55,7 +73,6 @@ export default function Home() {
           <div className="text-center space-y-4">
             <div className="font-mono text-2xl md:text-4xl text-primary">
               <span>{typedText}</span>
-              <span className="animate-blink">█</span>
             </div>
             <p className="font-mono text-primary text-sm md:text-base max-w-2xl mx-auto">
               A visual cron job manager with terminal-style interface. Schedule, monitor, and manage your automated tasks with precision.
