@@ -2,11 +2,14 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useUser } from '@clerk/nextjs';
 import { Logo } from '@/components/ui/Logo';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
+import { ProfileMenu } from '@/components/ui/ProfileMenu';
 
 export default function Home() {
+  const { isSignedIn } = useUser();
   const [typedText, setTypedText] = useState('');
   const [lineIndex, setLineIndex] = useState(0);
   const [charIndex, setCharIndex] = useState(0);
@@ -51,12 +54,7 @@ export default function Home() {
             <span className="text-primary font-mono text-sm">~/crondash</span>
           </div>
           <nav className="flex items-center gap-6">
-            <Link href="/login" className="font-mono text-sm text-muted hover:text-primary transition-colors">
-              [ LOGIN ]
-            </Link>
-            <Link href="/signup" className="font-mono text-sm text-muted hover:text-primary transition-colors">
-              [ SIGN UP ]
-            </Link>
+            <ProfileMenu />
           </nav>
         </div>
       </header>
@@ -81,12 +79,20 @@ export default function Home() {
 
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Button variant="primary">
-              <Link href="/signup">GET STARTED</Link>
-            </Button>
-            <Button variant="secondary">
-              <Link href="/login">LOGIN</Link>
-            </Button>
+            {isSignedIn ? (
+              <Button variant="primary" href="/dashboard">
+                DASHBOARD
+              </Button>
+            ) : (
+              <>
+                <Button variant="primary" href="/signup">
+                  GET STARTED
+                </Button>
+                <Button variant="secondary" href="/login">
+                  LOGIN
+                </Button>
+              </>
+            )}
           </div>
 
           {/* Features Grid */}

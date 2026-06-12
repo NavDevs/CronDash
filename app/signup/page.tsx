@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { SignUp } from '@clerk/nextjs';
 import { Logo } from '@/components/ui/Logo';
+import { ProfileMenu } from '@/components/ui/ProfileMenu';
 
 export default function SignupPage() {
   return (
@@ -13,10 +14,7 @@ export default function SignupPage() {
             ~/crondash
           </Link>
           <nav className="flex items-center gap-6">
-            <Link href="/login" className="font-mono text-sm text-primary hover:text-primary transition-colors">
-              [ LOGIN ]
-            </Link>
-            <Link href="/signup" className="font-mono text-sm text-primary">[ SIGN UP ]</Link>
+            <ProfileMenu />
           </nav>
         </div>
       </header>
@@ -33,8 +31,8 @@ export default function SignupPage() {
             </div>
             <div className="p-4">
               <SignUp
-                routing="path"
-                path="/signup"
+                routing="hash"
+                afterSignUpUrl="/dashboard"
                 signInUrl="/login"
                 appearance={{
                   elements: {
