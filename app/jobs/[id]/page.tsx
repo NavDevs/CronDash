@@ -8,6 +8,7 @@ import { StatusIndicator } from "@/components/ui/StatusIndicator"
 import { ProfileMenu } from "@/components/ui/ProfileMenu"
 import { JobActions } from "./JobActions"
 import { LogModal } from "@/components/LogModal"
+import { RunHistory } from "./RunHistory"
 
 export const dynamic = "force-dynamic";
 
@@ -154,34 +155,7 @@ export default async function JobDetailPage({
                 [INFO] NO RUN HISTORY YET. Click RUN NOW to trigger manually.
               </div>
             ) : (
-              <div className="space-y-2">
-                <div className="grid grid-cols-5 gap-4 font-mono text-xs text-primary border-b border-border pb-2">
-                  <div>TIMESTAMP</div>
-                  <div>STATUS</div>
-                  <div>STATUS CODE</div>
-                  <div>DURATION</div>
-                  <div>ACTIONS</div>
-                </div>
-
-                {job.runs.map((run) => (
-                  <div
-                    key={run.id}
-                    className="grid grid-cols-5 gap-4 font-mono text-sm items-center border-b border-border py-2 hover:bg-muted/10 transition-colors"
-                  >
-                    <div className="text-primary">{new Date(run.executedAt).toLocaleString()}</div>
-                    <div className={run.status === "success" ? "text-primary" : "text-error"}>
-                      {run.status === "success" ? "[OK]" : "[ERR]"}
-                    </div>
-                    <div className={run.statusCode === 200 ? 'text-primary' : 'text-error'}>
-                      {run.statusCode ?? "N/A"}
-                    </div>
-                    <div className="text-primary">{run.duration ?? 0}ms</div>
-                    <div>
-                      <LogModal run={{ ...run, executedAt: run.executedAt.toISOString() }} />
-                    </div>
-                  </div>
-                ))}
-              </div>
+              <RunHistory runs={job.runs.map(r => ({ ...r, executedAt: r.executedAt, response: r.response, error: r.error }))} />
             )}
           </Card>
 
