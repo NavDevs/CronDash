@@ -8,7 +8,6 @@ import { Card } from '@/components/ui/Card';
 
 export default function Home() {
   const [typedText, setTypedText] = useState('');
-  const [showCursor, setShowCursor] = useState(true);
   const fullText = 'MANAGE YOUR CRON JOBS LIKE A PRO_';
 
   useEffect(() => {
@@ -23,14 +22,6 @@ export default function Home() {
     }, 100);
 
     return () => clearInterval(timer);
-  }, []);
-
-  useEffect(() => {
-    const cursorTimer = setInterval(() => {
-      setShowCursor((prev) => !prev);
-    }, 500);
-
-    return () => clearInterval(cursorTimer);
   }, []);
 
   return (
@@ -64,7 +55,7 @@ export default function Home() {
           <div className="text-center space-y-4">
             <div className="font-mono text-2xl md:text-4xl text-primary">
               <span>{typedText}</span>
-              <span className={`animate-blink ${showCursor ? 'opacity-100' : 'opacity-0'}`}>█</span>
+              <span className="animate-blink">█</span>
             </div>
             <p className="font-mono text-primary text-sm md:text-base max-w-2xl mx-auto">
               A visual cron job manager with terminal-style interface. Schedule, monitor, and manage your automated tasks with precision.
