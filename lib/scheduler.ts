@@ -5,6 +5,7 @@ import { getNextRunTime } from "./cron-utils"
 
 // holds all active scheduled tasks in memory
 const scheduledJobs = new Map<string, ScheduledTask>()
+let initialized = false
 
 // schedule a single job
 export function scheduleJob(jobId: string, schedule: string) {
@@ -38,9 +39,17 @@ export function unscheduleJob(jobId: string) {
   }
 }
 
+// reschedule a job after editing (schedule may have changed)
+export function rescheduleJob(jobId: string, schedule: string) {
+  unscheduleJob(jobId)
+  scheduleJob(jobId, schedule)
+}
+
 // load ALL active jobs from DB and schedule them
-// call this once when server starts
 export async function initScheduler() {
+  if (initialized) return
+  initialized = true
+
   console.log("[SCHEDULER] Initializing...")
 
   const jobs = await prisma.job.findMany({
@@ -49,18 +58,17 @@ export async function initScheduler() {
 
   for (const job of jobs) {
     scheduleJob(job.id, job.schedule)
-    
-    // Calculate and update nextRun for each job
     const nextRun = getNextRunTime(job.schedule)
     if (nextRun) {
       await prisma.job.update({
         where: { id: job.id },
         data: { nextRun },
-      }).catch(() => {
-        // Ignore errors if job was deleted between load and update
-      })
+      }).catch(() => {})
     }
   }
 
   console.log(`[SCHEDULER] Loaded ${jobs.length} jobs`)
 }
+
+// Auto-initialize on module load (fires when server starts)
+initScheduler()

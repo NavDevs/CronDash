@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"
 import { cookies } from "next/headers"
 import { prisma } from "@/lib/prisma"
-import { scheduleJob, unscheduleJob } from "@/lib/scheduler"
+import { rescheduleJob, unscheduleJob } from "@/lib/scheduler"
 
 async function getSession() {
   const cookieStore = await cookies()
@@ -63,11 +63,18 @@ export async function PUT(
       data,
     })
 
-    if (data.enabled === false) {
-      unscheduleJob(resolvedParams.id)
-    } else if (data.enabled === true) {
+    if (job.count > 0) {
+      // Refetch the updated job to get fresh data
       const updatedJob = await prisma.job.findUnique({ where: { id: resolvedParams.id } })
-      if (updatedJob) scheduleJob(updatedJob.id, updatedJob.schedule)
+
+      if (updatedJob) {
+        if (updatedJob.enabled) {
+          // Schedule or reschedule with the (possibly new) schedule
+          rescheduleJob(updatedJob.id, updatedJob.schedule)
+        } else {
+          unscheduleJob(updatedJob.id)
+        }
+      }
     }
 
     return NextResponse.json({ updated: job.count })
