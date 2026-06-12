@@ -14,9 +14,10 @@ export const metadata: Metadata = {
   description: "Manage your cron jobs with a terminal-style interface",
   icons: {
     icon: [
-      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/favicon.png", type: "image/png" },
       { url: "/favicon.ico", sizes: "any" },
     ],
+    apple: "/apple-touch-icon.png",
   },
 };
 
