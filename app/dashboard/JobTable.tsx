@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { StatusIndicator } from "@/components/ui/StatusIndicator";
 
 const inputClass =
@@ -14,9 +15,12 @@ interface JobTableProps {
 const PAGE_SIZE = 10;
 
 export function JobTable({ jobs }: JobTableProps) {
+  const router = useRouter();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [page, setPage] = useState(0);
+  const [autoRefresh, setAutoRefresh] = useState(true);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const filtered = useMemo(() => {
     return jobs.filter((job) => {
@@ -41,6 +45,13 @@ export function JobTable({ jobs }: JobTableProps) {
 
   // Reset to page 0 when search/filter changes
   useEffect(() => setPage(0), [search, statusFilter]);
+
+  // Auto-refresh every 30 seconds
+  useEffect(() => {
+    if (!autoRefresh) return;
+    intervalRef.current = setInterval(() => router.refresh(), 30000);
+    return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
+  }, [autoRefresh, router]);
 
   return (
     <div className="space-y-4">
@@ -72,6 +83,19 @@ export function JobTable({ jobs }: JobTableProps) {
             <option value="success">LAST RUN: SUCCESS</option>
             <option value="failed">LAST RUN: FAILED</option>
           </select>
+        </div>
+        <div className="pb-1">
+          <button
+            onClick={() => setAutoRefresh(!autoRefresh)}
+            className={`font-mono text-xs px-3 py-2 border transition-colors ${
+              autoRefresh
+                ? "border-primary text-primary"
+                : "border-border text-muted"
+            }`}
+            title={autoRefresh ? "Auto-refresh ON (30s)" : "Auto-refresh OFF"}
+          >
+            {autoRefresh ? "[ REFRESH: ON ]" : "[ REFRESH: OFF ]"}
+          </button>
         </div>
       </div>
 
