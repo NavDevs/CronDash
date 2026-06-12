@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import { StatusIndicator } from "@/components/ui/StatusIndicator";
 
@@ -11,9 +11,12 @@ interface JobTableProps {
   jobs: any[];
 }
 
+const PAGE_SIZE = 10;
+
 export function JobTable({ jobs }: JobTableProps) {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [page, setPage] = useState(0);
 
   const filtered = useMemo(() => {
     return jobs.filter((job) => {
@@ -32,6 +35,12 @@ export function JobTable({ jobs }: JobTableProps) {
       return matchesSearch && matchesStatus;
     });
   }, [jobs, search, statusFilter]);
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const paginated = filtered.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
+
+  // Reset to page 0 when search/filter changes
+  useEffect(() => setPage(0), [search, statusFilter]);
 
   return (
     <div className="space-y-4">
@@ -80,7 +89,7 @@ export function JobTable({ jobs }: JobTableProps) {
           [INFO] NO JOBS MATCH YOUR FILTERS.
         </div>
       ) : (
-        filtered.map((job: any) => (
+        paginated.map((job: any) => (
           <div
             key={job.id}
             className="grid grid-cols-12 gap-4 font-mono text-sm items-center border-b border-border py-3 hover:bg-muted/10 transition-colors"
@@ -112,6 +121,49 @@ export function JobTable({ jobs }: JobTableProps) {
             </div>
           </div>
         ))
+      )}
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-center gap-2 pt-4 font-mono text-sm">
+          <button
+            onClick={() => setPage(Math.max(0, page - 1))}
+            disabled={page === 0}
+            className={`px-3 py-1 border transition-colors ${
+              page === 0
+                ? "border-border text-muted cursor-not-allowed"
+                : "border-border text-primary hover:border-primary"
+            }`}
+          >
+            PREV
+          </button>
+          <div className="flex gap-1">
+            {Array.from({ length: totalPages }, (_, i) => (
+              <button
+                key={i}
+                onClick={() => setPage(i)}
+                className={`px-3 py-1 border transition-colors ${
+                  i === page
+                    ? "border-primary bg-muted text-primary"
+                    : "border-border text-primary hover:border-primary"
+                }`}
+              >
+                {i + 1}
+              </button>
+            ))}
+          </div>
+          <button
+            onClick={() => setPage(Math.min(totalPages - 1, page + 1))}
+            disabled={page >= totalPages - 1}
+            className={`px-3 py-1 border transition-colors ${
+              page >= totalPages - 1
+                ? "border-border text-muted cursor-not-allowed"
+                : "border-border text-primary hover:border-primary"
+            }`}
+          >
+            NEXT
+          </button>
+        </div>
       )}
 
       <div className="font-mono text-xs text-primary text-right pt-2">
