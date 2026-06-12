@@ -49,7 +49,6 @@ CronDash/
 │   │   │   ├── logout/       # POST /api/auth/logout
 │   │   │   ├── register/     # POST /api/auth/register
 │   │   │   ├── me/           # GET /api/auth/me
-│   │   │   └── [...nextauth]/ # NextAuth handler (fallback)
 │   │   ├── jobs/             # Job CRUD endpoints
 │   │   │   ├── [id]/         # Single job operations
 │   │   │   │   ├── route.ts  # GET/PUT/DELETE
@@ -91,8 +90,6 @@ CronDash/
 │   ├── schema.prisma        # Database schema
 │   ├── dev.db               # SQLite database file
 │   └── migrations/          # Prisma migration files
-├── types/                   # TypeScript type definitions
-│   └── next-auth.d.ts       # NextAuth type augmentation
 ├── public/                  # Static assets
 ├── .env                     # Environment variables
 ├── .gitignore               # Git ignore rules

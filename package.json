@@ -9,13 +9,10 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "@libsql/client": "^0.17.3",
     "@prisma/client": "^5.22.0",
     "axios": "^1.16.1",
     "bcryptjs": "^3.0.3",
-    "iron-session": "^8.0.4",
     "next": "16.2.6",
-    "next-auth": "^4.24.14",
     "node-cron": "^4.2.1",
     "prisma": "^5.22.0",
     "react": "19.2.4",

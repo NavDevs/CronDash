@@ -3,11 +3,10 @@ export interface SessionData {
   email: string;
 }
 
-export const sessionOptions = {
-  password: process.env.SESSION_SECRET || "crondash-secret-key-must-be-32-chars",
-  cookieName: "crondash-session",
-  cookieOptions: {
-    secure: process.env.NODE_ENV === "production",
-    maxAge: 60 * 60 * 24 * 7, // 7 days
-  },
-};
+export function getSessionFromCookie(cookieValue: string): SessionData | null {
+  try {
+    return JSON.parse(Buffer.from(cookieValue, "base64").toString()) as SessionData;
+  } catch {
+    return null;
+  }
+}
