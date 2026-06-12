@@ -13,10 +13,7 @@ export const metadata: Metadata = {
   title: "CronDash - Visual Cron Job Manager",
   description: "Manage your cron jobs with a terminal-style interface",
   icons: {
-    icon: [
-      { url: "/favicon.png", type: "image/png" },
-      { url: "/favicon.ico", sizes: "any" },
-    ],
+    icon: "/favicon.png?v=3",
     apple: "/apple-touch-icon.png",
   },
 };

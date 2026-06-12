@@ -71,8 +71,8 @@ export default function Home() {
 
           {/* Hero Text with Typewriter Effect */}
           <div className="text-center space-y-4">
-            <div className="font-mono text-2xl md:text-4xl text-primary">
-              <span>{typedText}</span>
+            <div className="font-mono text-2xl md:text-4xl text-primary min-h-[2.5rem] md:min-h-[3rem]">
+              <span>{typedText}</span><span className="animate-blink">_</span>
             </div>
             <p className="font-mono text-primary text-sm md:text-base max-w-2xl mx-auto">
               A visual cron job manager with terminal-style interface. Schedule, monitor, and manage your automated tasks with precision.
