@@ -1,9 +1,10 @@
-import cron from "node-cron"
+import cron, { ScheduledTask } from "node-cron"
 import { prisma } from "@/lib/prisma"
 import { executeJob } from "./executor"
+import { getNextRunTime } from "./cron-utils"
 
 // holds all active scheduled tasks in memory
-const scheduledJobs = new Map<string, cron.ScheduledTask>()
+const scheduledJobs = new Map<string, ScheduledTask>()
 
 // schedule a single job
 export function scheduleJob(jobId: string, schedule: string) {
@@ -48,6 +49,17 @@ export async function initScheduler() {
 
   for (const job of jobs) {
     scheduleJob(job.id, job.schedule)
+    
+    // Calculate and update nextRun for each job
+    const nextRun = getNextRunTime(job.schedule)
+    if (nextRun) {
+      await prisma.job.update({
+        where: { id: job.id },
+        data: { nextRun },
+      }).catch(() => {
+        // Ignore errors if job was deleted between load and update
+      })
+    }
   }
 
   console.log(`[SCHEDULER] Loaded ${jobs.length} jobs`)

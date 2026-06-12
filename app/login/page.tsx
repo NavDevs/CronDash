@@ -15,11 +15,44 @@ function LoginForm() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [retryAfter, setRetryAfter] = useState<number | null>(null);
+
+  // Validation errors
+  const [errors, setErrors] = useState<{
+    email?: string;
+    password?: string;
+  }>({});
+
+  function validateForm() {
+    const newErrors: typeof errors = {};
+
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email) {
+      newErrors.email = 'Email is required';
+    } else if (!emailRegex.test(email)) {
+      newErrors.email = 'Please enter a valid email address';
+    }
+
+    // Password validation
+    if (!password) {
+      newErrors.password = 'Password is required';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  }
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
-    setLoading(true);
     setError('');
+    setRetryAfter(null);
+
+    if (!validateForm()) {
+      return;
+    }
+
+    setLoading(true);
 
     try {
       const res = await fetch('/api/auth/login', {
@@ -34,6 +67,16 @@ function LoginForm() {
       }
 
       const data = await res.json();
+
+      // Check for rate limit
+      if (res.status === 429) {
+        setError(data.error || 'Too many login attempts');
+        if (data.retryAfter) {
+          setRetryAfter(data.retryAfter);
+        }
+        setLoading(false);
+        return;
+      }
 
       if (!res.ok) {
         setError(data.error || 'Login failed');
@@ -54,29 +97,51 @@ function LoginForm() {
   return (
     <form onSubmit={handleLogin} className="space-y-6">
       <div className="space-y-4">
-        <Input
-          label="EMAIL"
-          prompt="user@crondash:~$"
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="enter your email"
-          required
-        />
-        <Input
-          label="PASSWORD"
-          prompt="user@crondash:~$"
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="enter your password"
-          required
-        />
+        <div>
+          <Input
+            label="EMAIL"
+            prompt="user@crondash:~$"
+            type="email"
+            value={email}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              setErrors({ ...errors, email: undefined });
+            }}
+            placeholder="enter your email"
+            required
+          />
+          {errors.email && (
+            <p className="font-mono text-xs text-error mt-1">[ERROR] {errors.email}</p>
+          )}
+        </div>
+
+        <div>
+          <Input
+            label="PASSWORD"
+            prompt="user@crondash:~$"
+            type="password"
+            value={password}
+            onChange={(e) => {
+              setPassword(e.target.value);
+              setErrors({ ...errors, password: undefined });
+            }}
+            placeholder="enter your password"
+            required
+          />
+          {errors.password && (
+            <p className="font-mono text-xs text-error mt-1">[ERROR] {errors.password}</p>
+          )}
+        </div>
       </div>
 
       {error && (
         <div className="font-mono text-sm text-error">
           [ERROR] {error}
+          {retryAfter && (
+            <span className="block mt-1 text-xs">
+              [INFO] Try again in {Math.ceil(retryAfter / 60)} minutes
+            </span>
+          )}
         </div>
       )}
 

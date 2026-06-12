@@ -29,9 +29,10 @@ CronDash is a web-based cron job management system that allows users to:
 | Language | TypeScript |
 | UI | React 19 + Tailwind CSS 4 |
 | Database | SQLite via Prisma ORM |
-| Auth | Custom session (iron-session) |
+| Auth | Custom session (base64 cookie) |
 | Scheduler | node-cron (in-process) |
 | HTTP Client | axios |
+| Email | Resend |
 | Fonts | JetBrains Mono (Google Fonts) |
 
 ---
@@ -79,9 +80,12 @@ CronDash/
 │   └── SchedulerInit.tsx    # Client-side scheduler initializer
 ├── lib/                     # Core business logic
 │   ├── prisma.ts            # Prisma client singleton
-│   ├── session.ts           # Session configuration (iron-session)
+│   ├── session.ts           # Session configuration
 │   ├── scheduler.ts         # Job scheduling (node-cron)
-│   └── executor.ts          # Job execution (axios HTTP calls)
+│   ├── executor.ts          # Job execution (axios HTTP calls)
+│   ├── alerts.ts            # Slack + email (Resend) alert dispatching
+│   ├── cron-utils.ts        # Cron validation, description, presets
+│   └── rate-limit.ts        # In-memory rate limiter for login
 ├── prisma/                  # Database schema & migrations
 │   ├── schema.prisma        # Database schema
 │   ├── dev.db               # SQLite database file
@@ -231,13 +235,25 @@ User Browser
 | `/api/jobs/[id]` | DELETE | Delete a job |
 | `/api/jobs/[id]/run` | POST | Trigger job manually |
 | `/api/jobs/[id]/runs` | GET | Get run history for a job |
+| `/api/jobs/[id]/toggle` | POST | Enable/disable a job |
+
+### Settings
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/settings/slack` | POST | Save Slack webhook URL |
+| `/api/settings/email` | POST | Save alert email address |
+| `/api/settings/apikey` | POST | Regenerate API key |
+| `/api/settings/danger/delete-all-jobs` | POST | Delete all user's jobs |
+| `/api/settings/danger/delete-account` | POST | Delete user account |
 
 ### System
 
 | Endpoint | Method | Description |
 |----------|--------|-------------|
 | `/api/init` | POST | Initialize scheduler (load all jobs) |
-| `/api/test` | POST | Test an HTTP endpoint |
+| `/api/cron` | GET | External cron trigger via API key |
+| `/api/test` | GET | Health check (Prisma connectivity) |
 
 ---
 
@@ -305,6 +321,10 @@ Create a `.env` file in the project root:
 ```env
 DATABASE_URL="file:./dev.db"
 SESSION_SECRET="your-secret-key-min-32-chars"
+
+# Email (Resend) — optional, alerts fall back to logging
+RESEND_API_KEY="re_..."
+RESEND_FROM_EMAIL="alerts@crondash.com"
 ```
 
 ### Available Scripts
@@ -341,6 +361,10 @@ CronDash uses a **terminal/hacker aesthetic** with:
 - [x] Response log viewer
 - [x] Cron expression reference guide
 - [x] User settings page
+- [x] Dashboard search & filter (by name, URL, schedule, status)
+- [x] Slack webhook failure notifications
+- [x] Email failure notifications via Resend
+- [x] External cron endpoint with API key auth
 
 ---
 

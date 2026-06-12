@@ -143,7 +143,7 @@ export default async function JobDetailPage({
                     {job.lastRun ? new Date(job.lastRun).toLocaleString() : 'N/A'}
                   </span>
                 </div>
-                <JobActions jobId={job.id} />
+                <JobActions jobId={job.id} enabled={job.enabled} />
               </div>
             </Card>
           </div>

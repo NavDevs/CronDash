@@ -1,9 +1,25 @@
 import { NextResponse } from "next/server"
 import { cookies } from "next/headers"
 import { prisma } from "@/lib/prisma"
+import { compare } from "bcryptjs"
+import { checkRateLimit, recordFailedAttempt, recordSuccessfulLogin, getClientIP } from "@/lib/rate-limit"
 
 export async function POST(req: Request) {
   try {
+    // Rate limiting check
+    const clientIP = getClientIP(req)
+    const rateLimit = checkRateLimit(clientIP)
+
+    if (!rateLimit.allowed) {
+      return NextResponse.json(
+        { 
+          error: `Too many login attempts. Please try again in ${Math.ceil(rateLimit.waitSeconds / 60)} minutes.`,
+          retryAfter: rateLimit.waitSeconds,
+        },
+        { status: 429 }
+      )
+    }
+
     const { email, password } = await req.json()
 
     if (!email || !password) {
@@ -15,12 +31,27 @@ export async function POST(req: Request) {
 
     const user = await prisma.user.findUnique({ where: { email } })
 
-    if (!user || user.password !== password) {
+    if (!user) {
+      recordFailedAttempt(clientIP)
       return NextResponse.json(
         { error: "Invalid email or password" },
         { status: 401 }
       )
     }
+
+    // Compare hashed password
+    const isValidPassword = await compare(password, user.password)
+
+    if (!isValidPassword) {
+      recordFailedAttempt(clientIP)
+      return NextResponse.json(
+        { error: "Invalid email or password" },
+        { status: 401 }
+      )
+    }
+
+    // Clear rate limit on successful login
+    recordSuccessfulLogin(clientIP)
 
     // Create session cookie
     const session = { userId: user.id, email: user.email }
@@ -34,6 +65,7 @@ export async function POST(req: Request) {
     response.cookies.set("crondash-session", sessionValue, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
       maxAge: 60 * 60 * 24 * 7, // 7 days
       path: "/",
     })

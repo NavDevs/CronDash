@@ -4,8 +4,8 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
-import { StatusIndicator } from "@/components/ui/StatusIndicator";
 import { ProfileMenu } from "@/components/ui/ProfileMenu";
+import { JobTable } from "./JobTable";
 
 export const dynamic = "force-dynamic";
 
@@ -108,40 +108,7 @@ export default async function DashboardPage() {
                 [INFO] NO JOBS FOUND. CREATE YOUR FIRST JOB!
               </div>
             ) : (
-              <div className="space-y-4">
-                <div className="grid grid-cols-12 gap-4 font-mono text-xs text-primary border-b border-border pb-2">
-                  <div className="col-span-3">NAME</div>
-                  <div className="col-span-2">SCHEDULE</div>
-                  <div className="col-span-2">STATUS</div>
-                  <div className="col-span-2">NEXT RUN</div>
-                  <div className="col-span-2">LAST RUN</div>
-                  <div className="col-span-1">ACTIONS</div>
-                </div>
-
-                {jobs.map((job: any) => (
-                  <div
-                    key={job.id}
-                    className="grid grid-cols-12 gap-4 font-mono text-sm items-center border-b border-border py-3 hover:bg-muted/10 transition-colors"
-                  >
-                    <div className="col-span-3 text-primary">{job.name}</div>
-                    <div className="col-span-2 text-primary">{job.schedule}</div>
-                    <div className="col-span-2">
-                      <StatusIndicator status={job.enabled ? 'success' : 'pending'} />
-                    </div>
-                    <div className="col-span-2 text-primary">
-                      {job.nextRun ? new Date(job.nextRun).toLocaleString() : 'N/A'}
-                    </div>
-                    <div className="col-span-2 text-primary">
-                      {job.lastRun ? new Date(job.lastRun).toLocaleString() : 'N/A'}
-                    </div>
-                    <div className="col-span-1 flex gap-2">
-                      <Button variant="primary" className="px-2 py-1 text-xs" href={`/jobs/${job.id}`}>
-                        VIEW
-                      </Button>
-                    </div>
-                  </div>
-                ))}
-              </div>
+              <JobTable jobs={jobs} />
             )}
           </Card>
 

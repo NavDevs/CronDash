@@ -1,5 +1,14 @@
 import axios from "axios";
+import { Resend } from "resend";
 import { prisma } from "@/lib/prisma";
+
+function getResend(): Resend | null {
+  const key = process.env.RESEND_API_KEY;
+  if (!key) return null;
+  return new Resend(key);
+}
+
+const fromEmail = process.env.RESEND_FROM_EMAIL || "alerts@crondash.com";
 
 export interface AlertPayload {
   jobId: string;
@@ -100,49 +109,47 @@ async function sendSlackAlert(webhookUrl: string, payload: AlertPayload) {
 async function sendEmailAlert(email: string, payload: AlertPayload) {
   const { jobName, status, statusCode, error, duration, executedAt } = payload;
 
-  // In a production environment, you would use a service like:
-  // - SendGrid
-  // - Resend
-  // - AWS SES
-  // - Nodemailer (with SMTP)
-  //
-  // For now, we'll log the email details.
-  // To enable email sending, set up one of the above services and replace this implementation.
-
   const subject = status === "success"
-    ? `[CronDash] ✅ Job "${jobName}" Succeeded`
-    : `[CronDash] ❌ Job "${jobName}" Failed`;
+    ? `[CronDash] Job "${jobName}" Succeeded`
+    : `[CronDash] Job "${jobName}" Failed`;
 
-  const body = `
-CronDash Job Alert
-==================
+  const body = [
+    "CronDash Job Alert",
+    "==================",
+    "",
+    `Job: ${jobName}`,
+    `Status: ${status.toUpperCase()}`,
+    `Status Code: ${statusCode || "N/A"}`,
+    `Duration: ${duration}ms`,
+    `Executed At: ${executedAt.toISOString()}`,
+    ...(error ? ["", "Error:", error] : []),
+    "",
+    "--",
+    "CronDash - Visual Cron Job Manager",
+  ].join("\n");
 
-Job: ${jobName}
-Status: ${status.toUpperCase()}
-Status Code: ${statusCode || "N/A"}
-Duration: ${duration}ms
-Executed At: ${executedAt.toISOString()}
-${error ? `\nError:\n${error}` : ""}
+  const resend = getResend();
+  if (!resend) {
+    console.log(`[ALERTS] Email alert for ${email}:`, { subject, body });
+    return;
+  }
 
---
-CronDash - Visual Cron Job Manager
-  `.trim();
+  try {
+    const { error: sendError } = await resend.emails.send({
+      from: fromEmail,
+      to: email,
+      subject,
+      text: body,
+    });
 
-  // Log the email (implement actual sending with your preferred email service)
-  console.log(`[ALERTS] Email alert for ${email}:`, {
-    subject,
-    body,
-  });
-
-  // TODO: Implement actual email sending
-  // Example with Resend:
-  // const resend = new Resend(process.env.RESEND_API_KEY);
-  // await resend.emails.send({
-  //   from: 'alerts@crondash.com',
-  //   to: email,
-  //   subject,
-  //   text: body,
-  // });
+    if (sendError) {
+      console.error(`[ALERTS] Resend error for job ${jobName}:`, sendError);
+    } else {
+      console.log(`[ALERTS] Email sent to ${email} for job ${jobName}`);
+    }
+  } catch (err: any) {
+    console.error(`[ALERTS] Failed to send email for job ${jobName}:`, err.message);
+  }
 }
 
 // Helper function to check if alerts should be sent

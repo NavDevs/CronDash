@@ -17,16 +17,55 @@ function SignupForm() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
+  // Validation errors
+  const [errors, setErrors] = useState<{
+    email?: string;
+    password?: string;
+    confirmPassword?: string;
+  }>({});
+
+  function validateForm() {
+    const newErrors: typeof errors = {};
+
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email) {
+      newErrors.email = 'Email is required';
+    } else if (!emailRegex.test(email)) {
+      newErrors.email = 'Please enter a valid email address';
+    }
+
+    // Password validation
+    if (!password) {
+      newErrors.password = 'Password is required';
+    } else if (password.length < 8) {
+      newErrors.password = 'Password must be at least 8 characters';
+    } else if (!/[A-Z]/.test(password)) {
+      newErrors.password = 'Password must contain at least one uppercase letter';
+    } else if (!/[0-9]/.test(password)) {
+      newErrors.password = 'Password must contain at least one number';
+    }
+
+    // Confirm password
+    if (!confirmPassword) {
+      newErrors.confirmPassword = 'Please confirm your password';
+    } else if (password !== confirmPassword) {
+      newErrors.confirmPassword = 'Passwords do not match';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  }
+
   async function handleSignup(e: React.FormEvent) {
     e.preventDefault();
-    setLoading(true);
     setError('');
 
-    if (password !== confirmPassword) {
-      setError('Passwords do not match');
-      setLoading(false);
+    if (!validateForm()) {
       return;
     }
+
+    setLoading(true);
 
     try {
       const res = await fetch('/api/auth/register', {
@@ -61,33 +100,62 @@ function SignupForm() {
   return (
     <form onSubmit={handleSignup} className="space-y-6">
       <div className="space-y-4">
-        <Input
-          label="EMAIL"
-          prompt="user@crondash:~$"
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="enter your email"
-          required
-        />
-        <Input
-          label="PASSWORD"
-          prompt="user@crondash:~$"
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="enter your password"
-          required
-        />
-        <Input
-          label="CONFIRM PASSWORD"
-          prompt="user@crondash:~$"
-          type="password"
-          value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)}
-          placeholder="confirm your password"
-          required
-        />
+        <div>
+          <Input
+            label="EMAIL"
+            prompt="user@crondash:~$"
+            type="email"
+            value={email}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              setErrors({ ...errors, email: undefined });
+            }}
+            placeholder="enter your email"
+            required
+          />
+          {errors.email && (
+            <p className="font-mono text-xs text-error mt-1">[ERROR] {errors.email}</p>
+          )}
+        </div>
+
+        <div>
+          <Input
+            label="PASSWORD"
+            prompt="user@crondash:~$"
+            type="password"
+            value={password}
+            onChange={(e) => {
+              setPassword(e.target.value);
+              setErrors({ ...errors, password: undefined });
+            }}
+            placeholder="enter a strong password"
+            required
+          />
+          {errors.password && (
+            <p className="font-mono text-xs text-error mt-1">[ERROR] {errors.password}</p>
+          )}
+          {!errors.password && password && (
+            <p className="font-mono text-xs text-primary mt-1">[INFO] Min 8 chars, 1 uppercase, 1 number</p>
+          )}
+        </div>
+
+        <div>
+          <Input
+            label="CONFIRM PASSWORD"
+            prompt="user@crondash:~$"
+            type="password"
+            value={confirmPassword}
+            onChange={(e) => {
+              setConfirmPassword(e.target.value);
+              setErrors({ ...errors, confirmPassword: undefined });
+            }}
+            placeholder="confirm your password"
+            required
+          />
+          {errors.confirmPassword && (
+            <p className="font-mono text-xs text-error mt-1">[ERROR] {errors.confirmPassword}</p>
+          )}
+        </div>
       </div>
 
       {error && (

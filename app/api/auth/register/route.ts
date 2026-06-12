@@ -1,13 +1,32 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
+import { hash, genSalt } from "bcryptjs"
 
 export async function POST(req: Request) {
   try {
     const { email, password } = await req.json()
 
+    // Validate input
     if (!email || !password) {
       return NextResponse.json(
         { error: "Email and password required" },
+        { status: 400 }
+      )
+    }
+
+    // Email format validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(email)) {
+      return NextResponse.json(
+        { error: "Invalid email format" },
+        { status: 400 }
+      )
+    }
+
+    // Password strength validation
+    if (password.length < 8) {
+      return NextResponse.json(
+        { error: "Password must be at least 8 characters" },
         { status: 400 }
       )
     }
@@ -20,10 +39,14 @@ export async function POST(req: Request) {
       )
     }
 
+    // Hash password with bcrypt
+    const salt = await genSalt(12)
+    const hashedPassword = await hash(password, salt)
+
     const user = await prisma.user.create({
       data: {
         email,
-        password, // plain text for now
+        password: hashedPassword,
       },
     })
 
@@ -39,6 +62,7 @@ export async function POST(req: Request) {
     response.cookies.set("crondash-session", sessionValue, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
       maxAge: 60 * 60 * 24 * 7, // 7 days
       path: "/",
     })

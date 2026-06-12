@@ -20,6 +20,14 @@ export default function SettingsPage() {
   const [showKey, setShowKey] = useState(false);
   const [copied, setCopied] = useState(false);
 
+  // Danger zone state
+  const [deleteAllJobsConfirm, setDeleteAllJobsConfirm] = useState('');
+  const [deleteAccountConfirm, setDeleteAccountConfirm] = useState('');
+  const [deletingJobs, setDeletingJobs] = useState(false);
+  const [deletingAccount, setDeletingAccount] = useState(false);
+  const [dangerError, setDangerError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
+
   // Messages
   const [slackSaved, setSlackSaved] = useState(false);
   const [emailSaved, setEmailSaved] = useState(false);
@@ -123,6 +131,84 @@ export default function SettingsPage() {
     setTimeout(() => setCopied(false), 2000);
   }
 
+  // Delete all jobs
+  async function handleDeleteAllJobs() {
+    if (deleteAllJobsConfirm !== 'DELETE ALL JOBS') {
+      setDangerError("Please type 'DELETE ALL JOBS' to confirm");
+      return;
+    }
+
+    setDangerError('');
+    setDeletingJobs(true);
+
+    try {
+      const res = await fetch('/api/settings/danger/delete-all-jobs', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'delete-all-jobs',
+          confirmText: deleteAllJobsConfirm,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setDangerError(data.error || 'Failed to delete jobs');
+        setDeletingJobs(false);
+        return;
+      }
+
+      setSuccessMessage(data.message || 'All jobs deleted');
+      setDeleteAllJobsConfirm('');
+      setTimeout(() => setSuccessMessage(''), 5000);
+    } catch (error) {
+      setDangerError('Something went wrong');
+    } finally {
+      setDeletingJobs(false);
+    }
+  }
+
+  // Delete account
+  async function handleDeleteAccount() {
+    if (deleteAccountConfirm !== 'DELETE MY ACCOUNT') {
+      setDangerError("Please type 'DELETE MY ACCOUNT' to confirm");
+      return;
+    }
+
+    if (!confirm('Are you absolutely sure? This will permanently delete your account and all your jobs.')) {
+      return;
+    }
+
+    setDangerError('');
+    setDeletingAccount(true);
+
+    try {
+      const res = await fetch('/api/settings/danger/delete-account', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'delete-account',
+          confirmText: deleteAccountConfirm,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setDangerError(data.error || 'Failed to delete account');
+        setDeletingAccount(false);
+        return;
+      }
+
+      // Redirect to home page after account deletion
+      router.push('/');
+    } catch (error) {
+      setDangerError('Something went wrong');
+      setDeletingAccount(false);
+    }
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center">
@@ -164,6 +250,12 @@ export default function SettingsPage() {
               Configure notifications, alerts, and API access
             </p>
           </div>
+
+          {successMessage && (
+            <div className="font-mono text-sm text-primary bg-muted border border-primary p-4">
+              [OK] {successMessage}
+            </div>
+          )}
 
           <Card title="SLACK INTEGRATION">
             <form onSubmit={handleSaveSlack} className="space-y-4">
@@ -260,16 +352,56 @@ export default function SettingsPage() {
           </Card>
 
           <Card title="DANGER ZONE">
-            <div className="space-y-4">
-              <div className="font-mono text-sm text-primary">
-                These actions are irreversible. Please proceed with caution.
-              </div>
-              <div className="flex gap-4">
-                <Button variant="error">
-                  DELETE ALL JOBS
+            <div className="space-y-6">
+              {dangerError && (
+                <div className="font-mono text-sm text-error border border-error p-3">
+                  [ERROR] {dangerError}
+                </div>
+              )}
+
+              {/* Delete All Jobs */}
+              <div className="space-y-3">
+                <div className="font-mono text-sm text-primary">
+                  <span className="text-error font-bold">DELETE ALL JOBS</span> - This will permanently delete all your cron jobs and their run history.
+                </div>
+                <Input
+                  label="CONFIRM BY TYPING 'DELETE ALL JOBS'"
+                  prompt="user@crondash:~$"
+                  type="text"
+                  value={deleteAllJobsConfirm}
+                  onChange={(e) => setDeleteAllJobsConfirm(e.target.value)}
+                  placeholder="DELETE ALL JOBS"
+                />
+                <Button
+                  variant="error"
+                  onClick={handleDeleteAllJobs}
+                  disabled={deleteAllJobsConfirm !== 'DELETE ALL JOBS' || deletingJobs}
+                >
+                  {deletingJobs ? 'DELETING...' : 'DELETE ALL JOBS'}
                 </Button>
-                <Button variant="error">
-                  DELETE ACCOUNT
+              </div>
+
+              <div className="border-t border-border pt-4" />
+
+              {/* Delete Account */}
+              <div className="space-y-3">
+                <div className="font-mono text-sm text-primary">
+                  <span className="text-error font-bold">DELETE ACCOUNT</span> - This will permanently delete your account and all associated data. This action cannot be undone.
+                </div>
+                <Input
+                  label="CONFIRM BY TYPING 'DELETE MY ACCOUNT'"
+                  prompt="user@crondash:~$"
+                  type="text"
+                  value={deleteAccountConfirm}
+                  onChange={(e) => setDeleteAccountConfirm(e.target.value)}
+                  placeholder="DELETE MY ACCOUNT"
+                />
+                <Button
+                  variant="error"
+                  onClick={handleDeleteAccount}
+                  disabled={deleteAccountConfirm !== 'DELETE MY ACCOUNT' || deletingAccount}
+                >
+                  {deletingAccount ? 'DELETING...' : 'DELETE MY ACCOUNT'}
                 </Button>
               </div>
             </div>
