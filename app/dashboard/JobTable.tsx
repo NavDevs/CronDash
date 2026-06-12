@@ -102,10 +102,10 @@ export function JobTable({ jobs }: JobTableProps) {
       <div className="grid grid-cols-12 gap-4 font-mono text-xs text-primary border-b border-border pb-2">
         <div className="col-span-3">NAME</div>
         <div className="col-span-2">SCHEDULE</div>
-        <div className="col-span-1">STATUS</div>
+        <div className="col-span-2">STATUS</div>
         <div className="col-span-2">NEXT RUN</div>
         <div className="col-span-2">LAST RUN</div>
-        <div className="col-span-2">URL</div>
+        <div className="col-span-1">URL</div>
       </div>
 
       {filtered.length === 0 ? (
@@ -127,8 +127,16 @@ export function JobTable({ jobs }: JobTableProps) {
               </Link>
             </div>
             <div className="col-span-2 text-primary">{job.schedule}</div>
-            <div className="col-span-1">
+            <div className="col-span-2 flex items-center gap-2">
               <StatusIndicator status={job.enabled ? "success" : "pending"} />
+              <span className="text-xs text-primary">
+                {job.enabled ? "ON" : "OFF"}
+              </span>
+              {job.runs[0] && (
+                <span className={`text-xs ${job.runs[0].status === "success" ? "text-primary" : "text-error"}`}>
+                  | {job.runs[0].status === "success" ? "OK" : "FAIL"}
+                </span>
+              )}
             </div>
             <div className="col-span-2 text-primary">
               {job.nextRun
@@ -140,7 +148,7 @@ export function JobTable({ jobs }: JobTableProps) {
                 ? new Date(job.lastRun).toLocaleString()
                 : "N/A"}
             </div>
-            <div className="col-span-2 text-primary truncate" title={job.url}>
+            <div className="col-span-1 text-primary truncate" title={job.url}>
               {job.url}
             </div>
           </div>
