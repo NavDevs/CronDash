@@ -17,15 +17,13 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       error: 'border-error text-error hover:bg-error hover:text-background',
     };
 
-    const buttonContent = `[ ${children} ]`;
-
     if (href) {
       return (
         <Link
           href={href}
           className={`${baseStyles} ${variantStyles[variant]} inline-block ${className}`}
         >
-          {buttonContent}
+          [ {children} ]
         </Link>
       );
     }
@@ -36,7 +34,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         className={`${baseStyles} ${variantStyles[variant]} ${className}`}
         {...props}
       >
-        {buttonContent}
+        [ {children} ]
       </button>
     );
   }
