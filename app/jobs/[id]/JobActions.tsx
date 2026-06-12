@@ -14,6 +14,7 @@ export function JobActions({ jobId, enabled, onToggle }: JobActionsProps) {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [toggling, setToggling] = useState(false)
+  const [duplicating, setDuplicating] = useState(false)
 
   async function handleRunNow() {
     setLoading(true)
@@ -29,6 +30,23 @@ export function JobActions({ jobId, enabled, onToggle }: JobActionsProps) {
     setToggling(false)
     if (onToggle) {
       onToggle(!enabled)
+    }
+  }
+
+  async function handleDuplicate() {
+    setDuplicating(true)
+    try {
+      const res = await fetch(`/api/jobs/${jobId}/duplicate`, { method: "POST" })
+      if (!res.ok) {
+        console.error("Failed to duplicate job")
+        setDuplicating(false)
+        return
+      }
+      const newJob = await res.json()
+      router.push(`/jobs/${newJob.id}`)
+    } catch (err) {
+      console.error("Failed to duplicate job:", err)
+      setDuplicating(false)
     }
   }
 
@@ -57,6 +75,15 @@ export function JobActions({ jobId, enabled, onToggle }: JobActionsProps) {
           EDIT JOB
         </Button>
       </Link>
+
+      <Button
+        variant="secondary"
+        className="w-full"
+        onClick={handleDuplicate}
+        disabled={duplicating}
+      >
+        {duplicating ? 'DUPLICATING...' : 'DUPLICATE'}
+      </Button>
     </div>
   )
 }
