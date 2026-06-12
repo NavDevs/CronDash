@@ -40,6 +40,11 @@ export async function sendAlerts(jobId: string, payload: AlertPayload) {
   if (user.alertEmail) {
     await sendEmailAlert(user.alertEmail, payload);
   }
+
+  // Send webhook notification if URL is configured
+  if (user.webhookUrl) {
+    await sendWebhookAlert(user.webhookUrl, payload);
+  }
 }
 
 async function sendSlackAlert(webhookUrl: string, payload: AlertPayload) {
@@ -149,6 +154,26 @@ async function sendEmailAlert(email: string, payload: AlertPayload) {
     }
   } catch (err: any) {
     console.error(`[ALERTS] Failed to send email for job ${jobName}:`, err.message);
+  }
+}
+
+async function sendWebhookAlert(webhookUrl: string, payload: AlertPayload) {
+  const { jobName, status, statusCode, error, duration, executedAt } = payload;
+
+  try {
+    await axios.post(webhookUrl, {
+      event: "job_alert",
+      job: jobName,
+      status,
+      statusCode: statusCode || null,
+      error: error || null,
+      duration,
+      executedAt: executedAt.toISOString(),
+      timestamp: new Date().toISOString(),
+    });
+    console.log(`[ALERTS] Webhook sent to ${webhookUrl} for job ${jobName}`);
+  } catch (err: any) {
+    console.error(`[ALERTS] Failed to send webhook for job ${jobName}:`, err.message);
   }
 }
 

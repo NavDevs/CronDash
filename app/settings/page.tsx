@@ -16,6 +16,7 @@ export default function SettingsPage() {
   // Settings state
   const [slackWebhook, setSlackWebhook] = useState('');
   const [alertEmail, setAlertEmail] = useState('');
+  const [webhookUrl, setWebhookUrl] = useState('');
   const [apiKey, setApiKey] = useState('');
   const [showKey, setShowKey] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -31,6 +32,7 @@ export default function SettingsPage() {
   // Messages
   const [slackSaved, setSlackSaved] = useState(false);
   const [emailSaved, setEmailSaved] = useState(false);
+  const [webhookSaved, setWebhookSaved] = useState(false);
 
   // Fetch current user settings
   useEffect(() => {
@@ -45,6 +47,7 @@ export default function SettingsPage() {
         const data = await res.json();
         setSlackWebhook(data.slackWebhook || '');
         setAlertEmail(data.alertEmail || '');
+        setWebhookUrl(data.webhookUrl || '');
         setApiKey(data.apiKey || '');
         setLoading(false);
       } catch (error) {
@@ -99,6 +102,30 @@ export default function SettingsPage() {
       }
     } catch (error) {
       console.error('Failed to save email:', error);
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  // Save webhook URL
+  async function handleSaveWebhook(e: React.FormEvent) {
+    e.preventDefault();
+    setSaving(true);
+    setWebhookSaved(false);
+
+    try {
+      const res = await fetch('/api/settings/webhook', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ webhookUrl }),
+      });
+
+      if (res.ok) {
+        setWebhookSaved(true);
+        setTimeout(() => setWebhookSaved(false), 3000);
+      }
+    } catch (error) {
+      console.error('Failed to save webhook:', error);
     } finally {
       setSaving(false);
     }
@@ -299,6 +326,30 @@ export default function SettingsPage() {
                   {saving ? 'SAVING...' : 'SAVE EMAIL'}
                 </Button>
                 {emailSaved && (
+                  <span className="font-mono text-sm text-primary">[OK] Saved!</span>
+                )}
+              </div>
+            </form>
+          </Card>
+
+          <Card title="WEBHOOK NOTIFICATIONS">
+            <form onSubmit={handleSaveWebhook} className="space-y-4">
+              <Input
+                label="WEBHOOK URL"
+                prompt="user@crondash:~$"
+                type="url"
+                value={webhookUrl}
+                onChange={(e) => setWebhookUrl(e.target.value)}
+                placeholder="https://hooks.example.com/crondash-alerts"
+              />
+              <div className="font-mono text-xs text-primary">
+                <span className="text-primary">[INFO]</span> CronDash will POST a JSON payload to this URL on job failure
+              </div>
+              <div className="flex items-center gap-4">
+                <Button variant="primary" type="submit" disabled={saving}>
+                  {saving ? 'SAVING...' : 'SAVE WEBHOOK'}
+                </Button>
+                {webhookSaved && (
                   <span className="font-mono text-sm text-primary">[OK] Saved!</span>
                 )}
               </div>

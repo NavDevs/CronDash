@@ -18,6 +18,7 @@ model User {
   email         String   @unique
   password      String
   slackWebhook  String?
+  webhookUrl    String?
   alertEmail    String?
   apiKey        String   @unique @default(cuid())
   createdAt     DateTime @default(now())
