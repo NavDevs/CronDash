@@ -32,7 +32,7 @@ export default function LoginPage() {
             <div className="p-4">
               <SignIn
                 routing="hash"
-                afterSignInUrl="/dashboard"
+                fallbackRedirectUrl="/dashboard"
                 signUpUrl="/signup"
                 appearance={{
                   elements: {
