@@ -3,6 +3,7 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/Button"
+import { toast } from "@/components/Toast"
 
 interface JobActionsProps {
   jobId: string
@@ -19,6 +20,7 @@ export function JobActions({ jobId, enabled, onToggle }: JobActionsProps) {
   async function handleRunNow() {
     setLoading(true)
     await fetch(`/api/jobs/${jobId}/run`, { method: "POST" })
+    toast("Job triggered", "success")
     router.refresh()
     setLoading(false)
   }
@@ -26,6 +28,7 @@ export function JobActions({ jobId, enabled, onToggle }: JobActionsProps) {
   async function handleToggle() {
     setToggling(true)
     await fetch(`/api/jobs/${jobId}/toggle`, { method: "POST" })
+    toast(enabled ? "Job disabled" : "Job enabled", "success")
     router.refresh()
     setToggling(false)
     if (onToggle) {
@@ -38,14 +41,15 @@ export function JobActions({ jobId, enabled, onToggle }: JobActionsProps) {
     try {
       const res = await fetch(`/api/jobs/${jobId}/duplicate`, { method: "POST" })
       if (!res.ok) {
-        console.error("Failed to duplicate job")
+        toast("Failed to duplicate job", "error")
         setDuplicating(false)
         return
       }
       const newJob = await res.json()
+      toast("Job duplicated", "success")
       router.push(`/jobs/${newJob.id}`)
     } catch (err) {
-      console.error("Failed to duplicate job:", err)
+      toast("Failed to duplicate job", "error")
       setDuplicating(false)
     }
   }

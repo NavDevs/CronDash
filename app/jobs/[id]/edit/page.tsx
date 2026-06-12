@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/Input'
 import { Card } from '@/components/ui/Card'
 import { ProfileMenu } from '@/components/ui/ProfileMenu'
 import { TestEndpoint } from '@/components/TestEndpoint'
+import { toast } from '@/components/Toast'
 import { validateCronExpression, CRON_PRESETS } from '@/lib/cron-utils'
 
 export default function EditJobPage() {
@@ -167,6 +168,7 @@ export default function EditJobPage() {
         return
       }
 
+      toast('Job updated', 'success')
       router.push(`/jobs/${jobId}`)
     } catch (err: any) {
       setError(err.message || 'Something went wrong')
@@ -190,6 +192,7 @@ export default function EditJobPage() {
         return
       }
 
+      toast('Job deleted', 'success')
       router.push('/dashboard')
     } catch (err: any) {
       setError(err.message || 'Something went wrong')

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { JetBrains_Mono } from "next/font/google";
 import "./globals.css";
-import { SchedulerInit } from "@/components/SchedulerInit";
+import { ToastContainer } from "@/components/Toast";
 
 const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
@@ -22,8 +22,8 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${jetbrainsMono.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">
-        <SchedulerInit />
         {children}
+        <ToastContainer />
         <div className="crt-overlay" />
       </body>
     </html>

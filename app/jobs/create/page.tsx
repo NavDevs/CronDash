@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/Input';
 import { Card } from '@/components/ui/Card';
 import { ProfileMenu } from '@/components/ui/ProfileMenu';
 import { TestEndpoint } from '@/components/TestEndpoint';
+import { toast } from '@/components/Toast';
 import { validateCronExpression, CRON_PRESETS } from '@/lib/cron-utils';
 
 export default function CreateJobPage() {
@@ -109,7 +110,7 @@ export default function CreateJobPage() {
         return;
       }
 
-      // job created — go to dashboard
+      toast("Job created", "success");
       router.push("/dashboard");
     } catch (err: any) {
       setError(err.message || "Something went wrong");

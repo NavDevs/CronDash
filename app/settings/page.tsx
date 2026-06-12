@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Card } from '@/components/ui/Card';
 import { ProfileMenu } from '@/components/ui/ProfileMenu';
+import { toast } from '@/components/Toast';
 
 export default function SettingsPage() {
   const router = useRouter();
@@ -73,6 +74,7 @@ export default function SettingsPage() {
       });
 
       if (res.ok) {
+        toast("Webhook saved", "success");
         setSlackSaved(true);
         setTimeout(() => setSlackSaved(false), 3000);
       }
@@ -97,6 +99,7 @@ export default function SettingsPage() {
       });
 
       if (res.ok) {
+        toast("Email saved", "success");
         setEmailSaved(true);
         setTimeout(() => setEmailSaved(false), 3000);
       }
@@ -121,6 +124,7 @@ export default function SettingsPage() {
       });
 
       if (res.ok) {
+        toast("Webhook URL saved", "success");
         setWebhookSaved(true);
         setTimeout(() => setWebhookSaved(false), 3000);
       }
