@@ -22,6 +22,11 @@ async function migratePasswords() {
   let skipped = 0
 
   for (const user of users) {
+    if (!user.password) {
+      console.log(`[SKIP] ${user.email} - no password (OAuth user)`)
+      skipped++
+      continue
+    }
     // Check if password is already hashed (bcrypt hashes start with $2)
     if (user.password.startsWith('$2')) {
       console.log(`[SKIP] ${user.email} - already hashed`)
@@ -31,7 +36,7 @@ async function migratePasswords() {
 
     // Hash the plain text password
     const salt = await genSalt(12)
-    const hashedPassword = await hash(user.password, salt)
+    const hashedPassword = await hash(user.password!, salt)
 
     await prisma.user.update({
       where: { id: user.id },

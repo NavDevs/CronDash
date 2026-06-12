@@ -1,5 +1,6 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
 }
 
 datasource db {
@@ -7,16 +8,10 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// To use Turso (edge SQLite):
-// 1. Create a database at https://turso.tech
-// 2. Get your connection URL (libsql://... or turso://...)
-// 3. Update DATABASE_URL in .env
-// 4. Run: npx prisma db push
-
 model User {
   id            String   @id @default(cuid())
   email         String   @unique
-  password      String
+  password      String?
   slackWebhook  String?
   webhookUrl    String?
   alertEmail    String?

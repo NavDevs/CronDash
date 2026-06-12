@@ -7,6 +7,7 @@ import { Logo } from '@/components/ui/Logo';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Card } from '@/components/ui/Card';
+import { GoogleAuthButton } from '@/components/GoogleAuthButton';
 
 function SignupForm() {
   const router = useRouter();
@@ -174,6 +175,17 @@ function SignupForm() {
       <Button variant="primary" className="w-full" type="submit" disabled={loading}>
         {loading ? 'CREATING...' : 'CREATE ACCOUNT'}
       </Button>
+
+      <div className="relative">
+        <div className="absolute inset-0 flex items-center">
+          <div className="w-full border-t border-border"></div>
+        </div>
+        <div className="relative flex justify-center text-xs font-mono">
+          <span className="bg-card px-2 text-primary">OR</span>
+        </div>
+      </div>
+
+      <GoogleAuthButton text="SIGN UP WITH GOOGLE" />
 
       <div className="text-center font-mono text-sm text-primary">
         <span>ALREADY HAVE AN ACCOUNT? </span>

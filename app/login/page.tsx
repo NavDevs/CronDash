@@ -7,6 +7,7 @@ import { Logo } from '@/components/ui/Logo';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Card } from '@/components/ui/Card';
+import { GoogleAuthButton } from '@/components/GoogleAuthButton';
 
 function LoginForm() {
   const router = useRouter();
@@ -158,6 +159,17 @@ function LoginForm() {
       <Button variant="primary" className="w-full" type="submit" disabled={loading}>
         {loading ? 'AUTHENTICATING...' : 'LOGIN'}
       </Button>
+
+      <div className="relative">
+        <div className="absolute inset-0 flex items-center">
+          <div className="w-full border-t border-border"></div>
+        </div>
+        <div className="relative flex justify-center text-xs font-mono">
+          <span className="bg-card px-2 text-primary">OR</span>
+        </div>
+      </div>
+
+      <GoogleAuthButton />
 
       <div className="text-center font-mono text-sm text-primary">
         <span>NEW USER? </span>

@@ -7,9 +7,12 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "migrate-passwords": "npx tsx scripts/migrate-passwords.ts"
+    "migrate-passwords": "npx tsx scripts/migrate-passwords.ts",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
+    "@libsql/client": "^0.8.1",
+    "@prisma/adapter-libsql": "^5.22.0",
     "@prisma/client": "^5.22.0",
     "axios": "^1.16.1",
     "bcryptjs": "^3.0.3",

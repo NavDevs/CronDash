@@ -39,6 +39,14 @@ export async function POST(req: Request) {
       )
     }
 
+    // OAuth-only users can't login with password
+    if (!user.password) {
+      return NextResponse.json(
+        { error: "This account uses Google login. Please sign in with Google." },
+        { status: 401 }
+      )
+    }
+
     // Compare hashed password
     const isValidPassword = await compare(password, user.password)
 
