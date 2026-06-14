@@ -100,12 +100,12 @@ export function JobTable({ jobs }: JobTableProps) {
       </div>
 
       <div className="grid grid-cols-12 gap-4 font-mono text-xs text-primary border-b border-border pb-2">
-        <div className="col-span-3">NAME</div>
-        <div className="col-span-2">SCHEDULE</div>
-        <div className="col-span-2">STATUS</div>
+        <div className="col-span-2">NAME</div>
+        <div className="col-span-1">SCHEDULE</div>
+        <div className="col-span-1">STATUS</div>
         <div className="col-span-2">NEXT RUN</div>
         <div className="col-span-2">LAST RUN</div>
-        <div className="col-span-1">URL</div>
+        <div className="col-span-4">URL</div>
       </div>
 
       {filtered.length === 0 ? (
@@ -118,7 +118,7 @@ export function JobTable({ jobs }: JobTableProps) {
             key={job.id}
             className="grid grid-cols-12 gap-4 font-mono text-sm items-center border-b border-border py-3 hover:bg-muted/10 transition-colors"
           >
-            <div className="col-span-3">
+            <div className="col-span-2">
               <Link
                 href={`/jobs/${job.id}`}
                 className="text-primary hover:text-secondary transition-colors"
@@ -126,8 +126,8 @@ export function JobTable({ jobs }: JobTableProps) {
                 {job.name}
               </Link>
             </div>
-            <div className="col-span-2 text-primary">{job.schedule}</div>
-            <div className="col-span-2 flex items-center gap-2">
+            <div className="col-span-1 text-primary">{job.schedule}</div>
+            <div className="col-span-1 flex items-center gap-2">
               <StatusIndicator status={job.enabled ? "success" : "pending"} />
               <span className="text-xs text-primary">
                 {job.enabled ? "ON" : "OFF"}
@@ -148,8 +148,10 @@ export function JobTable({ jobs }: JobTableProps) {
                 ? new Date(job.lastRun).toLocaleString()
                 : "N/A"}
             </div>
-            <div className="col-span-1 text-primary truncate" title={job.url}>
-              {job.url}
+            <div className="col-span-4 text-primary truncate" title={job.url}>
+              <a href={job.url} target="_blank" rel="noopener noreferrer" className="hover:text-secondary transition-colors">
+                {job.url}
+              </a>
             </div>
           </div>
         ))
