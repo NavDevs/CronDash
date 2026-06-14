@@ -6,6 +6,8 @@ services:
     buildCommand: npm install && npx prisma generate && npx prisma db push && npm run build
     startCommand: npm run start
     envVars:
+      - key: NODE_VERSION
+        value: "22"
       - key: DATABASE_URL
         sync: false
       - key: DIRECT_URL
