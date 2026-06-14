@@ -30,7 +30,9 @@ export async function GET(request: NextRequest) {
       return NextResponse.redirect(new URL('/login?error=oauth_not_configured', request.url));
     }
 
-    const origin = request.nextUrl.origin;
+    const proto = request.headers.get('x-forwarded-proto') || 'http';
+    const host = request.headers.get('host') || request.nextUrl.host;
+    const origin = `${proto}://${host}`;
     const redirectUri = `${origin}/api/auth/callback/google`;
 
     // Exchange code for tokens

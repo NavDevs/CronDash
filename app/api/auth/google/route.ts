@@ -10,8 +10,10 @@ export async function GET(request: NextRequest) {
   // Generate CSRF state token
   const state = crypto.randomBytes(32).toString('hex');
 
-  // Determine the redirect URI based on the request origin
-  const origin = request.nextUrl.origin;
+  // Determine the redirect URI — use forwarded proto for reverse proxy (Render)
+  const proto = request.headers.get('x-forwarded-proto') || 'http';
+  const host = request.headers.get('host') || request.nextUrl.host;
+  const origin = `${proto}://${host}`;
   const redirectUri = `${origin}/api/auth/callback/google`;
 
   // Build Google OAuth URL
