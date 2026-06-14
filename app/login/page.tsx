@@ -76,15 +76,15 @@ function LoginContent() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <header className="border-b border-border px-6 py-4">
-        <div className="max-w-6xl mx-auto flex items-center justify-between">
+      <header className="border-b border-border px-4 sm:px-6 py-4">
+        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <Link href="/" className="text-primary font-mono text-sm hover:text-secondary transition-colors">
             ~/crondash
           </Link>
         </div>
       </header>
 
-      <main className="flex-1 flex flex-col items-center justify-center px-6 py-12">
+      <main className="flex-1 flex flex-col items-center justify-center px-4 sm:px-6 py-8 sm:py-12">
         <div className="w-full max-w-md space-y-8">
           <div className="flex justify-center">
             <Logo />
@@ -151,8 +151,8 @@ function LoginContent() {
         </div>
       </main>
 
-      <footer className="border-t border-border px-6 py-4">
-        <div className="max-w-6xl mx-auto flex items-center justify-between font-mono text-xs text-primary">
+      <footer className="border-t border-border px-4 sm:px-6 py-4">
+        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 font-mono text-xs text-primary">
           <span>© 2026 CRONDASH</span>
           <span>LOGIN</span>
         </div>

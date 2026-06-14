@@ -120,9 +120,9 @@ export default function CreateJobPage() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <header className="border-b border-border px-6 py-4">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-6">
+      <header className="border-b border-border px-4 sm:px-6 py-4">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-2 sm:gap-6 flex-wrap justify-center">
             <Link href="/" className="font-mono text-sm text-primary hover:text-secondary transition-colors">
               ~/crondash
             </Link>
@@ -131,7 +131,7 @@ export default function CreateJobPage() {
             <span className="font-mono text-sm text-primary">/</span>
             <span className="font-mono text-sm text-primary">create</span>
           </div>
-          <nav className="flex items-center gap-6">
+          <nav className="flex flex-wrap justify-center items-center gap-4 sm:gap-6">
             <Link href="/dashboard" className="font-mono text-sm text-primary hover:text-primary transition-colors">
               [ DASHBOARD ]
             </Link>
@@ -141,7 +141,7 @@ export default function CreateJobPage() {
         </div>
       </header>
 
-      <main className="flex-1 px-6 py-8">
+      <main className="flex-1 px-4 sm:px-6 py-8">
         <div className="max-w-3xl mx-auto space-y-8">
           <div>
             <h1 className="font-mono text-2xl text-primary mb-2">
@@ -223,7 +223,7 @@ export default function CreateJobPage() {
               {/* HTTP Method */}
               <div>
                 <label className="font-mono text-sm text-primary block mb-2">HTTP METHOD</label>
-                <div className="flex gap-4">
+                <div className="flex flex-wrap gap-4">
                   {['GET', 'POST', 'PUT', 'DELETE'].map((method) => (
                     <label key={method} className="flex items-center gap-2 cursor-pointer">
                       <input
@@ -325,8 +325,8 @@ export default function CreateJobPage() {
         </div>
       </main>
 
-      <footer className="border-t border-border px-6 py-4">
-        <div className="max-w-7xl mx-auto flex items-center justify-between font-mono text-xs text-primary">
+      <footer className="border-t border-border px-4 sm:px-6 py-4">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 font-mono text-xs text-primary">
           <span>© 2026 CRONDASH</span>
           <span>CREATE JOB VIEW</span>
         </div>

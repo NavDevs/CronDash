@@ -59,8 +59,8 @@ export default function Home() {
   return (
     <div className="min-h-screen flex flex-col">
       {/* Header */}
-      <header className="border-b border-border px-6 py-4">
-        <div className="max-w-6xl mx-auto flex items-center justify-between">
+      <header className="border-b border-border px-4 sm:px-6 py-4">
+        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-4">
             <span className="text-primary font-mono text-sm">~/crondash</span>
           </div>
@@ -71,7 +71,7 @@ export default function Home() {
       </header>
 
       {/* Hero Section */}
-      <main className="flex-1 flex flex-col items-center justify-center px-6 py-20">
+      <main className="flex-1 flex flex-col items-center justify-center px-4 sm:px-6 py-12 sm:py-20">
         <div className="max-w-4xl w-full space-y-12">
           {/* Logo */}
           <div className="flex justify-center">
@@ -181,8 +181,8 @@ export default function Home() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-border px-6 py-4">
-        <div className="max-w-6xl mx-auto flex items-center justify-between font-mono text-xs text-primary">
+      <footer className="border-t border-border px-4 sm:px-6 py-4">
+        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 font-mono text-xs text-primary">
           <span>© 2026 CRONDASH</span>
           <span>BUILT WITH NEXT.JS + TAILWIND</span>
         </div>

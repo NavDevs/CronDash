@@ -148,14 +148,14 @@ export default function SettingsPage() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <header className="border-b border-border px-6 py-4">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-6">
+      <header className="border-b border-border px-4 sm:px-6 py-4">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-2 sm:gap-6">
             <Link href="/" className="font-mono text-sm text-primary hover:text-secondary transition-colors">~/crondash</Link>
             <span className="font-mono text-sm text-primary">/</span>
             <span className="font-mono text-sm text-primary">settings</span>
           </div>
-          <nav className="flex items-center gap-6">
+          <nav className="flex flex-wrap justify-center items-center gap-4 sm:gap-6">
             <Link href="/dashboard" className="font-mono text-sm text-primary hover:text-primary transition-colors">[ DASHBOARD ]</Link>
             <Link href="/jobs/create" className="font-mono text-sm text-primary hover:text-primary transition-colors">[ CREATE JOB ]</Link>
             <ProfileMenu />
@@ -163,7 +163,7 @@ export default function SettingsPage() {
         </div>
       </header>
 
-      <main className="flex-1 px-6 py-8">
+      <main className="flex-1 px-4 sm:px-6 py-8 overflow-hidden w-full">
         <div className="max-w-3xl mx-auto space-y-8">
           <div>
             <h1 className="font-mono text-2xl text-primary mb-2">// SYSTEM CONFIGURATION</h1>
@@ -212,7 +212,7 @@ export default function SettingsPage() {
               <div>
                 <label className="font-mono text-sm text-primary block mb-2">YOUR API KEY</label>
                 <div className="flex items-center gap-2">
-                  <div className="flex-1 bg-background border border-border p-3 font-mono text-sm text-primary">
+                  <div className="flex-1 bg-background border border-border p-3 font-mono text-sm text-primary overflow-x-auto whitespace-nowrap">
                     {showKey ? apiKey : '•'.repeat(Math.min(apiKey.length, 40))}
                   </div>
                   <Button variant="secondary" onClick={() => setShowKey(!showKey)} className="whitespace-nowrap">
@@ -235,7 +235,7 @@ export default function SettingsPage() {
               <p>Configure an external cron service (like cron-job.org) to trigger your jobs:</p>
               <div className="bg-muted p-4 border border-border">
                 <div className="text-xs text-primary mb-2">ENDPOINT URL:</div>
-                <code className="text-sm break-all">https://your-domain.com/api/cron?apiKey={apiKey || 'YOUR_API_KEY'}</code>
+                <code className="text-sm break-all inline-block w-full overflow-x-auto whitespace-nowrap">https://your-domain.com/api/cron?apiKey={apiKey || 'YOUR_API_KEY'}</code>
               </div>
               <div className="text-xs text-primary"><span className="text-primary">[TIP]</span> Set the external cron to run every 5 minutes (*/5 * * * *) for best results.</div>
             </div>
@@ -271,8 +271,8 @@ export default function SettingsPage() {
         </div>
       </main>
 
-      <footer className="border-t border-border px-6 py-4">
-        <div className="max-w-7xl mx-auto flex items-center justify-between font-mono text-xs text-primary">
+      <footer className="border-t border-border px-4 sm:px-6 py-4">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 font-mono text-xs text-primary">
           <span>© 2026 CRONDASH</span>
           <span>SETTINGS VIEW</span>
         </div>

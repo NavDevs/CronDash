@@ -47,17 +47,17 @@ export default async function DashboardPage() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <header className="border-b border-border px-6 py-4">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-6">
+      <header className="border-b border-border px-4 sm:px-6 py-4">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-2 sm:gap-6">
             <Link href="/" className="font-mono text-sm text-primary hover:text-secondary transition-colors">
               ~/crondash
             </Link>
             <span className="font-mono text-sm text-primary">/</span>
             <span className="font-mono text-sm text-primary">dashboard</span>
           </div>
-          <nav className="flex items-center gap-6">
-            <Link href="/dashboard" className="font-mono text-sm text-primary">[ DASHBOARD ]</Link>
+          <nav className="flex flex-wrap justify-center items-center gap-4 sm:gap-6">
+            <Link href="/dashboard" className="hidden sm:inline font-mono text-sm text-primary">[ DASHBOARD ]</Link>
             <Link href="/jobs/create" className="font-mono text-sm text-primary hover:text-primary transition-colors">
               [ CREATE JOB ]
             </Link>
@@ -66,20 +66,20 @@ export default async function DashboardPage() {
         </div>
       </header>
 
-      <main className="flex-1 px-6 py-8">
-        <div className="max-w-7xl mx-auto space-y-8">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <main className="flex-1 px-4 sm:px-6 py-8 w-full overflow-hidden">
+        <div className="max-w-7xl mx-auto space-y-8 w-full">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             <Card title="TOTAL JOBS">
-              <div className="font-mono text-3xl text-primary">{totalJobs}</div>
+              <div className="font-mono text-2xl sm:text-3xl text-primary">{totalJobs}</div>
             </Card>
             <Card title="ACTIVE">
-              <div className="font-mono text-3xl text-primary">{activeJobs}</div>
+              <div className="font-mono text-2xl sm:text-3xl text-primary">{activeJobs}</div>
             </Card>
             <Card title="FAILED">
-              <div className="font-mono text-3xl text-error">{failedJobs}</div>
+              <div className="font-mono text-2xl sm:text-3xl text-error">{failedJobs}</div>
             </Card>
             <Card title="SUCCESS RATE">
-              <div className="font-mono text-3xl text-primary">{successRate}%</div>
+              <div className="font-mono text-2xl sm:text-3xl text-primary">{successRate}%</div>
             </Card>
           </div>
 
@@ -89,23 +89,25 @@ export default async function DashboardPage() {
                 [INFO] NO JOBS FOUND. CREATE YOUR FIRST JOB!
               </div>
             ) : (
-              <JobTable jobs={jobs} />
+              <div className="overflow-x-auto w-full">
+                <JobTable jobs={jobs} />
+              </div>
             )}
           </Card>
 
-          <div className="flex justify-between items-center">
-            <div className="font-mono text-sm text-primary">
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div className="font-mono text-sm text-primary text-center sm:text-left">
               <span className="text-primary">[INFO]</span> {totalJobs === 0 ? "GET STARTED BY CREATING YOUR FIRST JOB" : "ALL SYSTEMS OPERATIONAL"}
             </div>
-            <Button variant="primary" href="/jobs/create">
+            <Button variant="primary" href="/jobs/create" className="w-full sm:w-auto">
               CREATE NEW JOB
             </Button>
           </div>
         </div>
       </main>
 
-      <footer className="border-t border-border px-6 py-4">
-        <div className="max-w-7xl mx-auto flex items-center justify-between font-mono text-xs text-primary">
+      <footer className="border-t border-border px-4 sm:px-6 py-4">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 font-mono text-xs text-primary">
           <span>© 2026 CRONDASH</span>
           <span>DASHBOARD VIEW</span>
         </div>
