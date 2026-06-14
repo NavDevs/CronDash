@@ -10,6 +10,8 @@ const publicPaths = [
   '/api/auth/login',
   '/api/auth/register',
   '/api/auth/logout',
+  '/api/auth/google',
+  '/api/auth/callback/google',
   '/api/cron',
   '/api/test',
 ];
