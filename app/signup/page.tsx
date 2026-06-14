@@ -155,7 +155,7 @@ export default function SignupPage() {
       </main>
 
       <footer className="border-t border-border px-4 sm:px-6 py-4">
-        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 font-mono text-xs text-primary">
+        <div className="max-w-6xl mx-auto flex items-center justify-between font-mono text-xs text-primary">
           <span>© 2026 CRONDASH</span>
           <span>SIGN UP</span>
         </div>

@@ -48,15 +48,15 @@ export default async function DashboardPage() {
   return (
     <div className="min-h-screen flex flex-col">
       <header className="border-b border-border px-4 sm:px-6 py-4">
-        <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
-          <div className="flex items-center gap-2 sm:gap-6 shrink-0">
+        <div className="max-w-7xl mx-auto flex items-center justify-between overflow-x-auto whitespace-nowrap">
+          <div className="flex items-center gap-4 sm:gap-6">
             <Link href="/" className="font-mono text-sm text-primary hover:text-secondary transition-colors">
               ~/crondash
             </Link>
             <span className="font-mono text-sm text-primary">/</span>
             <span className="font-mono text-sm text-primary">dashboard</span>
           </div>
-          <nav className="flex items-center gap-4 sm:gap-6 shrink-0">
+          <nav className="flex items-center gap-4 sm:gap-6 ml-4">
             <Link href="/dashboard" className="hidden sm:inline font-mono text-sm text-primary">[ DASHBOARD ]</Link>
             <Link href="/jobs/create" className="font-mono text-sm text-primary hover:text-primary transition-colors">
               [ CREATE JOB ]
@@ -107,7 +107,7 @@ export default async function DashboardPage() {
       </main>
 
       <footer className="border-t border-border px-4 sm:px-6 py-4">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 font-mono text-xs text-primary">
+        <div className="max-w-7xl mx-auto flex items-center justify-between font-mono text-xs text-primary">
           <span>© 2026 CRONDASH</span>
           <span>DASHBOARD VIEW</span>
         </div>

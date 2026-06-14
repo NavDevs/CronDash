@@ -47,17 +47,17 @@ export default async function JobDetailPage({
   return (
     <div className="min-h-screen flex flex-col">
       <header className="border-b border-border px-4 sm:px-6 py-4">
-        <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
-          <div className="flex items-center gap-2 sm:gap-6 flex-wrap shrink-0">
+        <div className="max-w-7xl mx-auto flex items-center justify-between overflow-x-auto whitespace-nowrap">
+          <div className="flex items-center gap-4 sm:gap-6">
             <Link href="/" className="font-mono text-sm text-primary hover:text-secondary transition-colors">
               ~/crondash
             </Link>
             <span className="font-mono text-sm text-primary">/</span>
             <span className="font-mono text-sm text-primary">jobs</span>
             <span className="font-mono text-sm text-primary">/</span>
-            <span className="font-mono text-sm text-primary max-w-[100px] sm:max-w-none truncate">{job.id}</span>
+            <span className="font-mono text-sm text-primary">{job.id}</span>
           </div>
-          <nav className="flex items-center gap-4 sm:gap-6 shrink-0">
+          <nav className="flex items-center gap-4 sm:gap-6 ml-4">
             <Link href="/dashboard" className="font-mono text-sm text-primary hover:text-primary transition-colors">
               [ DASHBOARD ]
             </Link>
@@ -165,7 +165,7 @@ export default async function JobDetailPage({
       </main>
 
       <footer className="border-t border-border px-4 sm:px-6 py-4">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 font-mono text-xs text-primary">
+        <div className="max-w-7xl mx-auto flex items-center justify-between font-mono text-xs text-primary">
           <span>© 2026 CRONDASH</span>
           <span>JOB DETAIL VIEW</span>
         </div>

@@ -211,8 +211,8 @@ export default function EditJobPage() {
   return (
     <div className="min-h-screen flex flex-col">
       <header className="border-b border-border px-4 sm:px-6 py-4">
-        <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
-          <div className="flex items-center gap-2 sm:gap-6 flex-wrap shrink-0">
+        <div className="max-w-7xl mx-auto flex items-center justify-between overflow-x-auto whitespace-nowrap">
+          <div className="flex items-center gap-4 sm:gap-6">
             <Link href="/" className="font-mono text-sm text-primary hover:text-secondary transition-colors">
               ~/crondash
             </Link>
@@ -223,14 +223,14 @@ export default function EditJobPage() {
             <span className="hidden sm:inline font-mono text-sm text-primary">/</span>
             <span className="font-mono text-sm text-primary">jobs</span>
             <span className="font-mono text-sm text-primary">/</span>
-            <span className="font-mono text-sm text-primary max-w-[80px] sm:max-w-none truncate">{jobId.slice(0, 8)}...</span>
+            <span className="font-mono text-sm text-primary">{jobId.slice(0, 8)}...</span>
             <span className="font-mono text-sm text-secondary">/edit</span>
           </div>
-          <nav className="flex items-center gap-4 sm:gap-6 shrink-0">
-            <Link href="/dashboard" className="font-mono text-sm text-primary hover:text-primary transition-colors">
+          <nav className="flex items-center gap-4 sm:gap-6 ml-4">
+            <Link href="/dashboard" className="hidden sm:inline font-mono text-sm text-primary hover:text-primary transition-colors">
               [ DASHBOARD ]
             </Link>
-            <Link href="/jobs/create" className="font-mono text-sm text-primary hover:text-primary transition-colors">
+            <Link href="/jobs/create" className="hidden sm:inline font-mono text-sm text-primary hover:text-primary transition-colors">
               [ CREATE JOB ]
             </Link>
             <ProfileMenu />
@@ -449,7 +449,7 @@ export default function EditJobPage() {
       </main>
 
       <footer className="border-t border-border px-4 sm:px-6 py-4">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 font-mono text-xs text-primary">
+        <div className="max-w-7xl mx-auto flex items-center justify-between font-mono text-xs text-primary">
           <span>© 2026 CRONDASH</span>
           <span>EDIT JOB VIEW</span>
         </div>
