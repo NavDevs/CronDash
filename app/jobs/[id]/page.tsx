@@ -46,16 +46,16 @@ export default async function JobDetailPage({
 
   return (
     <div className="min-h-screen flex flex-col">
-      <header className="border-b border-border px-4 sm:px-6 py-4">
-        <div className="max-w-7xl mx-auto flex items-center justify-between overflow-x-auto whitespace-nowrap">
+      <header className="border-b border-border px-4 sm:px-6 py-4 relative z-40">
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-4 sm:gap-6">
-            <Link href="/" className="font-mono text-sm text-primary hover:text-secondary transition-colors">
+            <Link href="/" className="hidden sm:inline font-mono text-sm text-primary hover:text-secondary transition-colors">
               ~/crondash
             </Link>
-            <span className="font-mono text-sm text-primary">/</span>
-            <span className="font-mono text-sm text-primary">jobs</span>
-            <span className="font-mono text-sm text-primary">/</span>
-            <span className="font-mono text-sm text-primary">{job.id}</span>
+            <span className="hidden sm:inline font-mono text-sm text-primary">/</span>
+            <span className="hidden sm:inline font-mono text-sm text-primary">jobs</span>
+            <span className="hidden sm:inline font-mono text-sm text-primary">/</span>
+            <span className="font-mono text-sm text-primary max-w-[150px] sm:max-w-none truncate">{job.id}</span>
           </div>
           <nav className="flex items-center gap-4 sm:gap-6 ml-4">
             <Link href="/dashboard" className="hidden sm:inline font-mono text-sm text-primary hover:text-primary transition-colors">

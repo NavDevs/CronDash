@@ -120,16 +120,16 @@ export default function CreateJobPage() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <header className="border-b border-border px-4 sm:px-6 py-4">
-        <div className="max-w-7xl mx-auto flex items-center justify-between overflow-x-auto whitespace-nowrap">
+      <header className="border-b border-border px-4 sm:px-6 py-4 relative z-40">
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2 sm:gap-4">
-            <Link href="/" className="font-mono text-xs sm:text-sm text-primary hover:text-secondary transition-colors">
+            <Link href="/" className="hidden sm:inline font-mono text-xs sm:text-sm text-primary hover:text-secondary transition-colors">
               ~/crondash
             </Link>
             <span className="hidden sm:inline font-mono text-sm text-primary">/</span>
             <span className="hidden sm:inline font-mono text-sm text-primary">jobs</span>
             <span className="hidden sm:inline font-mono text-sm text-primary">/</span>
-            <span className="hidden sm:inline font-mono text-sm text-primary">create</span>
+            <span className="font-mono text-sm text-primary">create</span>
           </div>
           <nav className="flex items-center gap-2 sm:gap-6 ml-2">
             <Link href="/dashboard" className="hidden sm:inline font-mono text-xs sm:text-sm text-primary hover:text-primary transition-colors">
@@ -208,7 +208,7 @@ export default function CreateJobPage() {
                       key={preset.value}
                       type="button"
                       onClick={() => applyPreset(preset.value)}
-                      className={`font-mono text-xs p-2 border transition-colors text-left ${
+                      className={`font-mono text-[10px] sm:text-xs whitespace-nowrap p-1 sm:p-2 border transition-colors text-center sm:text-left ${
                         form.schedule === preset.value
                           ? 'border-primary bg-muted text-primary'
                           : 'border-border text-primary hover:border-primary'
