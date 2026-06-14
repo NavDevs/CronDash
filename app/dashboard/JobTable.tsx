@@ -3,7 +3,6 @@
 import { useState, useMemo, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { StatusIndicator } from "@/components/ui/StatusIndicator";
 
 const inputClass =
   "bg-transparent border border-border text-primary font-mono outline-none focus:border-primary transition-colors px-3 py-2 text-sm";
@@ -13,6 +12,52 @@ interface JobTableProps {
 }
 
 const PAGE_SIZE = 10;
+
+function StatusBadge({ enabled, lastStatus }: { enabled: boolean; lastStatus?: string }) {
+  if (!enabled) {
+    return (
+      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-mono bg-[#1a1a1a] border border-[#333] text-[#888]">
+        <span className="w-1.5 h-1.5 rounded-full bg-[#555]" />
+        DISABLED
+      </span>
+    );
+  }
+  if (lastStatus === "failed") {
+    return (
+      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-mono bg-red-950/40 border border-red-800/50 text-red-400">
+        <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+        FAILED
+      </span>
+    );
+  }
+  if (lastStatus === "success") {
+    return (
+      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-mono bg-green-950/40 border border-green-700/50 text-green-400">
+        <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
+        ACTIVE
+      </span>
+    );
+  }
+  return (
+    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-mono bg-yellow-950/40 border border-yellow-700/50 text-yellow-400">
+      <span className="w-1.5 h-1.5 rounded-full bg-yellow-400 animate-pulse" />
+      WAITING
+    </span>
+  );
+}
+
+function formatDate(date: string | null | undefined) {
+  if (!date) return "—";
+  const d = new Date(date);
+  const now = new Date();
+  const diff = now.getTime() - d.getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return "just now";
+  if (mins < 60) return `${mins}m ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs}h ago`;
+  return d.toLocaleDateString(undefined, { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
+}
 
 export function JobTable({ jobs }: JobTableProps) {
   const router = useRouter();
@@ -43,10 +88,8 @@ export function JobTable({ jobs }: JobTableProps) {
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const paginated = filtered.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
 
-  // Reset to page 0 when search/filter changes
   useEffect(() => setPage(0), [search, statusFilter]);
 
-  // Auto-refresh every 30 seconds
   useEffect(() => {
     if (!autoRefresh) return;
     intervalRef.current = setInterval(() => router.refresh(), 30000);
@@ -55,11 +98,10 @@ export function JobTable({ jobs }: JobTableProps) {
 
   return (
     <div className="space-y-4">
-      <div className="flex gap-4 items-end">
-        <div className="flex-1">
-          <label className="font-mono text-xs text-primary block mb-1">
-            SEARCH
-          </label>
+      {/* Toolbar */}
+      <div className="flex flex-wrap gap-3 items-end">
+        <div className="flex-1 min-w-[200px]">
+          <label className="font-mono text-xs text-primary/60 block mb-1.5">SEARCH</label>
           <input
             type="text"
             value={search}
@@ -68,93 +110,110 @@ export function JobTable({ jobs }: JobTableProps) {
             className={`${inputClass} w-full`}
           />
         </div>
-        <div className="w-48">
-          <label className="font-mono text-xs text-primary block mb-1">
-            STATUS FILTER
-          </label>
+        <div className="w-44">
+          <label className="font-mono text-xs text-primary/60 block mb-1.5">STATUS FILTER</label>
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
             className={`${inputClass} w-full`}
           >
-            <option value="all">ALL</option>
+            <option value="all">ALL JOBS</option>
             <option value="active">ACTIVE</option>
             <option value="disabled">DISABLED</option>
-            <option value="success">LAST RUN: SUCCESS</option>
-            <option value="failed">LAST RUN: FAILED</option>
+            <option value="success">LAST: SUCCESS</option>
+            <option value="failed">LAST: FAILED</option>
           </select>
         </div>
-        <div className="pb-1">
-          <button
-            onClick={() => setAutoRefresh(!autoRefresh)}
-            className={`font-mono text-xs px-3 py-2 border transition-colors ${
-              autoRefresh
-                ? "border-primary text-primary"
-                : "border-border text-muted"
-            }`}
-            title={autoRefresh ? "Auto-refresh ON (30s)" : "Auto-refresh OFF"}
-          >
-            {autoRefresh ? "[ REFRESH: ON ]" : "[ REFRESH: OFF ]"}
-          </button>
-        </div>
+        <button
+          onClick={() => setAutoRefresh(!autoRefresh)}
+          className={`font-mono text-xs px-3 py-2 border transition-colors ${
+            autoRefresh
+              ? "border-primary/60 text-primary bg-primary/5"
+              : "border-border text-primary/40"
+          }`}
+          title={autoRefresh ? "Auto-refresh ON (30s)" : "Auto-refresh OFF"}
+        >
+          {autoRefresh ? "⟳ AUTO REFRESH ON" : "⟳ AUTO REFRESH OFF"}
+        </button>
       </div>
 
-      <div className="grid grid-cols-12 gap-4 font-mono text-xs text-primary border-b border-border pb-2">
-        <div className="col-span-2">NAME</div>
-        <div className="col-span-1">SCHEDULE</div>
-        <div className="col-span-1">STATUS</div>
-        <div className="col-span-2">NEXT RUN</div>
-        <div className="col-span-2">LAST RUN</div>
-        <div className="col-span-4">URL</div>
+      {/* Table header — desktop only */}
+      <div className="hidden md:grid grid-cols-12 gap-x-4 font-mono text-[11px] text-primary/40 uppercase tracking-wider border-b border-border pb-2 px-4">
+        <div className="col-span-2">Name</div>
+        <div className="col-span-2">Schedule</div>
+        <div className="col-span-2">Status</div>
+        <div className="col-span-2">Last Run</div>
+        <div className="col-span-2">Next Run</div>
+        <div className="col-span-2">Target URL</div>
       </div>
 
+      {/* Job rows */}
       {filtered.length === 0 ? (
-        <div className="font-mono text-sm text-primary py-4 text-center">
-          [INFO] NO JOBS MATCH YOUR FILTERS.
+        <div className="font-mono text-sm text-primary/50 py-8 text-center border border-border rounded">
+          [INFO] NO JOBS MATCH YOUR FILTERS
         </div>
       ) : (
-        paginated.map((job: any) => (
-          <div
-            key={job.id}
-            className="grid grid-cols-12 gap-4 font-mono text-sm items-center border-b border-border py-3 hover:bg-muted/10 transition-colors"
-          >
-            <div className="col-span-2">
-              <Link
-                href={`/jobs/${job.id}`}
-                className="text-primary hover:text-secondary transition-colors"
+        <div className="space-y-2">
+          {paginated.map((job: any) => {
+            const lastStatus = job.runs[0]?.status;
+            return (
+              <div
+                key={job.id}
+                className="group border border-border hover:border-primary/40 bg-[#0d0d0d] hover:bg-[#111] transition-all duration-200 rounded-sm px-4 py-3"
               >
-                {job.name}
-              </Link>
-            </div>
-            <div className="col-span-1 text-primary">{job.schedule}</div>
-            <div className="col-span-1 flex items-center gap-2">
-              <StatusIndicator status={job.enabled ? "success" : "pending"} />
-              <span className="text-xs text-primary">
-                {job.enabled ? "ON" : "OFF"}
-              </span>
-              {job.runs[0] && (
-                <span className={`text-xs ${job.runs[0].status === "success" ? "text-primary" : "text-error"}`}>
-                  | {job.runs[0].status === "success" ? "OK" : "FAIL"}
-                </span>
-              )}
-            </div>
-            <div className="col-span-2 text-primary">
-              {job.nextRun
-                ? new Date(job.nextRun).toLocaleString()
-                : "N/A"}
-            </div>
-            <div className="col-span-2 text-primary">
-              {job.lastRun
-                ? new Date(job.lastRun).toLocaleString()
-                : "N/A"}
-            </div>
-            <div className="col-span-4 text-primary truncate" title={job.url}>
-              <a href={job.url} target="_blank" rel="noopener noreferrer" className="hover:text-secondary transition-colors">
-                {job.url}
-              </a>
-            </div>
-          </div>
-        ))
+                {/* Mobile layout */}
+                <div className="md:hidden space-y-2">
+                  <div className="flex items-center justify-between">
+                    <Link href={`/jobs/${job.id}`} className="font-mono text-base text-primary hover:text-secondary transition-colors font-semibold">
+                      {job.name}
+                    </Link>
+                    <StatusBadge enabled={job.enabled} lastStatus={lastStatus} />
+                  </div>
+                  <div className="font-mono text-xs text-primary/50 break-all">
+                    <a href={job.url} target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">
+                      {job.url}
+                    </a>
+                  </div>
+                  <div className="flex flex-wrap gap-4 font-mono text-xs text-primary/60">
+                    <span>⏱ {job.schedule}</span>
+                    <span>Last: {formatDate(job.lastRun)}</span>
+                    <span>Next: {formatDate(job.nextRun)}</span>
+                  </div>
+                </div>
+
+                {/* Desktop layout */}
+                <div className="hidden md:grid grid-cols-12 gap-x-4 items-center">
+                  <div className="col-span-2">
+                    <Link
+                      href={`/jobs/${job.id}`}
+                      className="font-mono text-sm text-primary hover:text-secondary transition-colors font-semibold truncate block"
+                      title={job.name}
+                    >
+                      {job.name}
+                    </Link>
+                  </div>
+                  <div className="col-span-2 font-mono text-sm text-primary/70 truncate" title={job.schedule}>
+                    {job.schedule}
+                  </div>
+                  <div className="col-span-2">
+                    <StatusBadge enabled={job.enabled} lastStatus={lastStatus} />
+                  </div>
+                  <div className="col-span-2 font-mono text-sm text-primary/70" title={job.lastRun ? new Date(job.lastRun).toLocaleString() : ""}>
+                    {formatDate(job.lastRun)}
+                  </div>
+                  <div className="col-span-2 font-mono text-sm text-primary/70" title={job.nextRun ? new Date(job.nextRun).toLocaleString() : ""}>
+                    {formatDate(job.nextRun)}
+                  </div>
+                  <div className="col-span-2 font-mono text-xs text-primary/50 truncate" title={job.url}>
+                    <a href={job.url} target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">
+                      {job.url.replace(/^https?:\/\//, "")}
+                    </a>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
       )}
 
       {/* Pagination */}
@@ -165,11 +224,11 @@ export function JobTable({ jobs }: JobTableProps) {
             disabled={page === 0}
             className={`px-3 py-1 border transition-colors ${
               page === 0
-                ? "border-border text-muted cursor-not-allowed"
+                ? "border-border text-primary/20 cursor-not-allowed"
                 : "border-border text-primary hover:border-primary"
             }`}
           >
-            PREV
+            ← PREV
           </button>
           <div className="flex gap-1">
             {Array.from({ length: totalPages }, (_, i) => (
@@ -178,7 +237,7 @@ export function JobTable({ jobs }: JobTableProps) {
                 onClick={() => setPage(i)}
                 className={`px-3 py-1 border transition-colors ${
                   i === page
-                    ? "border-primary bg-muted text-primary"
+                    ? "border-primary bg-primary/10 text-primary"
                     : "border-border text-primary hover:border-primary"
                 }`}
               >
@@ -191,16 +250,16 @@ export function JobTable({ jobs }: JobTableProps) {
             disabled={page >= totalPages - 1}
             className={`px-3 py-1 border transition-colors ${
               page >= totalPages - 1
-                ? "border-border text-muted cursor-not-allowed"
+                ? "border-border text-primary/20 cursor-not-allowed"
                 : "border-border text-primary hover:border-primary"
             }`}
           >
-            NEXT
+            NEXT →
           </button>
         </div>
       )}
 
-      <div className="font-mono text-xs text-primary text-right pt-2">
+      <div className="font-mono text-xs text-primary/40 text-right pt-1">
         {filtered.length} / {jobs.length} JOBS
       </div>
     </div>
