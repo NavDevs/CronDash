@@ -16,7 +16,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
           <span className="font-mono text-primary">{prompt}</span>
           <input
             ref={ref}
-            className={`flex-1 bg-transparent border-b border-border text-primary font-mono outline-none focus:border-primary transition-colors ${className}`}
+            className={`flex-1 min-w-0 bg-transparent border-b border-border text-primary font-mono outline-none focus:border-primary transition-colors ${className}`}
             {...props}
           />
         </div>

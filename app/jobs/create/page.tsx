@@ -122,20 +122,20 @@ export default function CreateJobPage() {
     <div className="min-h-screen flex flex-col">
       <header className="border-b border-border px-4 sm:px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between overflow-x-auto whitespace-nowrap">
-          <div className="flex items-center gap-4 sm:gap-6">
-            <Link href="/" className="font-mono text-sm text-primary hover:text-secondary transition-colors">
+          <div className="flex items-center gap-2 sm:gap-4">
+            <Link href="/" className="font-mono text-xs sm:text-sm text-primary hover:text-secondary transition-colors">
               ~/crondash
             </Link>
-            <span className="font-mono text-sm text-primary">/</span>
-            <span className="font-mono text-sm text-primary">jobs</span>
-            <span className="font-mono text-sm text-primary">/</span>
-            <span className="font-mono text-sm text-primary">create</span>
+            <span className="hidden sm:inline font-mono text-sm text-primary">/</span>
+            <span className="hidden sm:inline font-mono text-sm text-primary">jobs</span>
+            <span className="hidden sm:inline font-mono text-sm text-primary">/</span>
+            <span className="hidden sm:inline font-mono text-sm text-primary">create</span>
           </div>
-          <nav className="flex items-center gap-4 sm:gap-6 ml-4">
-            <Link href="/dashboard" className="hidden sm:inline font-mono text-sm text-primary hover:text-primary transition-colors">
+          <nav className="flex items-center gap-2 sm:gap-6 ml-2">
+            <Link href="/dashboard" className="hidden sm:inline font-mono text-xs sm:text-sm text-primary hover:text-primary transition-colors">
               [ DASHBOARD ]
             </Link>
-            <Link href="/jobs/create" className="font-mono text-sm text-primary">[ CREATE JOB ]</Link>
+            <Link href="/jobs/create" className="font-mono text-xs sm:text-sm text-primary">[ CREATE JOB ]</Link>
             <ProfileMenu />
           </nav>
         </div>
