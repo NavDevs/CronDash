@@ -211,8 +211,8 @@ export default function EditJobPage() {
   return (
     <div className="min-h-screen flex flex-col">
       <header className="border-b border-border px-4 sm:px-6 py-4">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2 sm:gap-6 flex-wrap justify-center">
+        <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
+          <div className="flex items-center gap-2 sm:gap-6 flex-wrap shrink-0">
             <Link href="/" className="font-mono text-sm text-primary hover:text-secondary transition-colors">
               ~/crondash
             </Link>
@@ -226,7 +226,7 @@ export default function EditJobPage() {
             <span className="font-mono text-sm text-primary max-w-[80px] sm:max-w-none truncate">{jobId.slice(0, 8)}...</span>
             <span className="font-mono text-sm text-secondary">/edit</span>
           </div>
-          <nav className="flex flex-wrap justify-center items-center gap-4 sm:gap-6">
+          <nav className="flex items-center gap-4 sm:gap-6 shrink-0">
             <Link href="/dashboard" className="font-mono text-sm text-primary hover:text-primary transition-colors">
               [ DASHBOARD ]
             </Link>

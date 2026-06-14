@@ -1,7 +1,7 @@
 export const Logo = () => {
   return (
-    <div className="font-mono text-primary text-sm leading-tight">
-      <pre className="text-xs">
+    <div className="font-mono text-primary text-sm leading-tight flex flex-col items-center max-w-full overflow-hidden">
+      <pre className="text-[0.45rem] sm:text-xs leading-none sm:leading-tight">
 {`
  ██████╗ ██████╗ ███████╗ █████╗ ███╗   ███╗███████╗
  ██╔══██╗██╔══██╗██╔════╝██╔══██╗████╗ ████║██╔════╝

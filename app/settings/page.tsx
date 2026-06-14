@@ -149,13 +149,13 @@ export default function SettingsPage() {
   return (
     <div className="min-h-screen flex flex-col">
       <header className="border-b border-border px-4 sm:px-6 py-4">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2 sm:gap-6">
+        <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
+          <div className="flex items-center gap-2 sm:gap-6 flex-wrap shrink-0">
             <Link href="/" className="font-mono text-sm text-primary hover:text-secondary transition-colors">~/crondash</Link>
             <span className="font-mono text-sm text-primary">/</span>
             <span className="font-mono text-sm text-primary">settings</span>
           </div>
-          <nav className="flex flex-wrap justify-center items-center gap-4 sm:gap-6">
+          <nav className="flex items-center gap-4 sm:gap-6 shrink-0">
             <Link href="/dashboard" className="font-mono text-sm text-primary hover:text-primary transition-colors">[ DASHBOARD ]</Link>
             <Link href="/jobs/create" className="font-mono text-sm text-primary hover:text-primary transition-colors">[ CREATE JOB ]</Link>
             <ProfileMenu />
