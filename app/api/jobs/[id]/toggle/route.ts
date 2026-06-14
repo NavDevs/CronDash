@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { scheduleJob, unscheduleJob } from "@/lib/scheduler"
-import { requireUserId } from "@/lib/clerk-auth"
+import { requireUserId } from "@/lib/auth"
 
 export async function POST(
   request: Request,

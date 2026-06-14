@@ -1,7 +1,7 @@
 import { notFound, redirect } from "next/navigation"
 import Link from "next/link"
-import { auth } from "@clerk/nextjs/server"
 import { prisma } from "@/lib/prisma"
+import { requireUserId } from "@/lib/auth"
 import { Card } from "@/components/ui/Card"
 import { StatusIndicator } from "@/components/ui/StatusIndicator"
 import { ProfileMenu } from "@/components/ui/ProfileMenu"
@@ -15,9 +15,10 @@ export default async function JobDetailPage({
 }: {
   params: { id: string }
 }) {
-  const { userId } = await auth()
-
-  if (!userId) {
+  let userId: string
+  try {
+    userId = await requireUserId()
+  } catch {
     redirect("/login")
   }
 

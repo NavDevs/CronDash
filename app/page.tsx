@@ -2,14 +2,13 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { useUser } from '@clerk/nextjs';
 import { Logo } from '@/components/ui/Logo';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { ProfileMenu } from '@/components/ui/ProfileMenu';
 
 export default function Home() {
-  const { isSignedIn } = useUser();
+  const [isSignedIn, setIsSignedIn] = useState<boolean | null>(null);
   const [typedText, setTypedText] = useState('');
   const [lineIndex, setLineIndex] = useState(0);
   const [charIndex, setCharIndex] = useState(0);
@@ -21,6 +20,18 @@ export default function Home() {
     'YOUR TERMINAL FOR CRON JOBS',
   ];
 
+  // Check auth status
+  useEffect(() => {
+    fetch('/api/auth/me')
+      .then((res) => {
+        setIsSignedIn(res.ok);
+      })
+      .catch(() => {
+        setIsSignedIn(false);
+      });
+  }, []);
+
+  // Typewriter effect
   useEffect(() => {
     const currentLine = lines[lineIndex];
     let timeout: ReturnType<typeof setTimeout>;
@@ -79,7 +90,9 @@ export default function Home() {
 
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            {isSignedIn ? (
+            {isSignedIn === null ? (
+              <div className="font-mono text-sm text-primary animate-pulse">LOADING...</div>
+            ) : isSignedIn ? (
               <Button variant="primary" href="/dashboard">
                 DASHBOARD
               </Button>
@@ -106,7 +119,7 @@ export default function Home() {
                   &gt; Set HTTP endpoints
                 </p>
                 <p className="font-mono text-sm text-primary">
-                  &gt; Configure headers & body
+                  &gt; Configure headers &amp; body
                 </p>
               </div>
             </Card>

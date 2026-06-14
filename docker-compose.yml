@@ -4,10 +4,9 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - DATABASE_URL=file:./dev.db
-      - SESSION_SECRET=${SESSION_SECRET:-change-this-to-a-random-secret}
-      - RESEND_API_KEY=${RESEND_API_KEY:-}
-      - RESEND_FROM_EMAIL=${RESEND_FROM_EMAIL:-alerts@crondash.com}
+      - DATABASE_URL=file:./prisma/dev.db
+      - SESSION_SECRET=docker-dev-secret-key-min-32-characters-long
+      - NODE_ENV=production
     volumes:
       - crondash-data:/app/prisma
 

@@ -1,7 +1,7 @@
-import { auth } from "@clerk/nextjs/server"
 import { redirect } from "next/navigation"
 import Link from "next/link"
 import { prisma } from "@/lib/prisma"
+import { requireUserId } from "@/lib/auth"
 import { Button } from "@/components/ui/Button"
 import { Card } from "@/components/ui/Card"
 import { ProfileMenu } from "@/components/ui/ProfileMenu"
@@ -10,9 +10,10 @@ import { JobTable } from "./JobTable"
 export const dynamic = "force-dynamic"
 
 export default async function DashboardPage() {
-  const { userId } = await auth()
-
-  if (!userId) {
+  let userId: string
+  try {
+    userId = await requireUserId()
+  } catch {
     redirect("/login")
   }
 

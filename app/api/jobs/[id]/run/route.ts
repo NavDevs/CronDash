@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { executeJob } from "@/lib/executor"
-import { requireUserId } from "@/lib/clerk-auth"
+import { requireUserId } from "@/lib/auth"
 
 export async function POST(
   req: Request,
