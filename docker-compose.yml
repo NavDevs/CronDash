@@ -4,11 +4,7 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - DATABASE_URL=file:./prisma/dev.db
+      - DATABASE_URL=postgresql://user:password@endpoint-pooler.region.aws.neon.tech/dbname?sslmode=require
+      - DIRECT_URL=postgresql://user:password@endpoint.region.aws.neon.tech/dbname?sslmode=require
       - SESSION_SECRET=docker-dev-secret-key-min-32-characters-long
       - NODE_ENV=production
-    volumes:
-      - crondash-data:/app/prisma
-
-volumes:
-  crondash-data:
