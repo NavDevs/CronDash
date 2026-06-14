@@ -63,6 +63,20 @@ export function ProfileMenu() {
             <div className="font-mono text-xs text-primary">{user.email}</div>
           </div>
           <Link
+            href="/dashboard"
+            className="block sm:hidden font-mono text-sm text-primary px-4 py-2 hover:bg-muted/20 transition-colors"
+            onClick={() => setShowMenu(false)}
+          >
+            [ DASHBOARD ]
+          </Link>
+          <Link
+            href="/jobs/create"
+            className="block sm:hidden font-mono text-sm text-primary px-4 py-2 hover:bg-muted/20 transition-colors"
+            onClick={() => setShowMenu(false)}
+          >
+            [ CREATE JOB ]
+          </Link>
+          <Link
             href="/settings"
             className="block font-mono text-sm text-primary px-4 py-2 hover:bg-muted/20 transition-colors"
             onClick={() => setShowMenu(false)}

@@ -156,8 +156,8 @@ export default function SettingsPage() {
             <span className="font-mono text-sm text-primary">settings</span>
           </div>
           <nav className="flex items-center gap-4 sm:gap-6 ml-4">
-            <Link href="/dashboard" className="font-mono text-sm text-primary hover:text-primary transition-colors">[ DASHBOARD ]</Link>
-            <Link href="/jobs/create" className="font-mono text-sm text-primary hover:text-primary transition-colors">[ CREATE JOB ]</Link>
+            <Link href="/dashboard" className="hidden sm:inline font-mono text-sm text-primary hover:text-primary transition-colors">[ DASHBOARD ]</Link>
+            <Link href="/jobs/create" className="hidden sm:inline font-mono text-sm text-primary hover:text-primary transition-colors">[ CREATE JOB ]</Link>
             <ProfileMenu />
           </nav>
         </div>
