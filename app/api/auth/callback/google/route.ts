@@ -2,37 +2,41 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { hashPassword, setSessionCookie } from '@/lib/auth';
 
+function getOrigin(request: NextRequest): string {
+  const proto = request.headers.get('x-forwarded-proto') || 'http';
+  const host = request.headers.get('x-forwarded-host') || request.headers.get('host') || request.nextUrl.host;
+  return `${proto}://${host}`;
+}
+
 export async function GET(request: NextRequest) {
   const { searchParams } = request.nextUrl;
   const code = searchParams.get('code');
   const state = searchParams.get('state');
   const error = searchParams.get('error');
+  const origin = getOrigin(request);
 
   // Handle user denial
   if (error) {
-    return NextResponse.redirect(new URL('/login?error=google_denied', request.url));
+    return NextResponse.redirect(`${origin}/login?error=google_denied`);
   }
 
   if (!code || !state) {
-    return NextResponse.redirect(new URL('/login?error=missing_params', request.url));
+    return NextResponse.redirect(`${origin}/login?error=missing_params`);
   }
 
   // Verify CSRF state
   const storedState = request.cookies.get('oauth_state')?.value;
   if (!storedState || storedState !== state) {
-    return NextResponse.redirect(new URL('/login?error=invalid_state', request.url));
+    return NextResponse.redirect(`${origin}/login?error=invalid_state`);
   }
 
   try {
     const clientId = process.env.GOOGLE_CLIENT_ID;
     const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
     if (!clientId || !clientSecret) {
-      return NextResponse.redirect(new URL('/login?error=oauth_not_configured', request.url));
+      return NextResponse.redirect(`${origin}/login?error=oauth_not_configured`);
     }
 
-    const proto = request.headers.get('x-forwarded-proto') || 'http';
-    const host = request.headers.get('host') || request.nextUrl.host;
-    const origin = `${proto}://${host}`;
     const redirectUri = `${origin}/api/auth/callback/google`;
 
     // Exchange code for tokens
@@ -49,7 +53,7 @@ export async function GET(request: NextRequest) {
     });
 
     if (!tokenRes.ok) {
-      return NextResponse.redirect(new URL('/login?error=token_exchange_failed', request.url));
+      return NextResponse.redirect(`${origin}/login?error=token_exchange_failed`);
     }
 
     const tokenData = await tokenRes.json();
@@ -60,14 +64,14 @@ export async function GET(request: NextRequest) {
     });
 
     if (!userInfoRes.ok) {
-      return NextResponse.redirect(new URL('/login?error=userinfo_failed', request.url));
+      return NextResponse.redirect(`${origin}/login?error=userinfo_failed`);
     }
 
     const googleUser = await userInfoRes.json();
     const email = googleUser.email;
 
     if (!email) {
-      return NextResponse.redirect(new URL('/login?error=no_email', request.url));
+      return NextResponse.redirect(`${origin}/login?error=no_email`);
     }
 
     // Find or create user
@@ -88,11 +92,11 @@ export async function GET(request: NextRequest) {
     await setSessionCookie({ userId: user.id, email: user.email });
 
     // Clear the CSRF state cookie and redirect to dashboard
-    const response = NextResponse.redirect(new URL('/dashboard', request.url));
+    const response = NextResponse.redirect(`${origin}/dashboard`);
     response.cookies.set('oauth_state', '', { maxAge: 0, path: '/' });
     return response;
   } catch (err) {
     console.error('Google OAuth error:', err);
-    return NextResponse.redirect(new URL('/login?error=server_error', request.url));
+    return NextResponse.redirect(`${origin}/login?error=server_error`);
   }
 }
