@@ -23,7 +23,7 @@ export async function executeJob(jobId: string) {
       url: job.url,
       headers: job.headers ? JSON.parse(job.headers) : {},
       data: job.body || undefined,
-      timeout: 30000, // 30 second timeout
+      timeout: 120000, // 120 second timeout to allow free-tier servers to wake up
     })
 
     const duration = Date.now() - startTime
