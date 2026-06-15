@@ -16,6 +16,7 @@ export function JobActions({ jobId, enabled, onToggle }: JobActionsProps) {
   const [loading, setLoading] = useState(false)
   const [toggling, setToggling] = useState(false)
   const [duplicating, setDuplicating] = useState(false)
+  const [deleting, setDeleting] = useState(false)
 
   async function handleRunNow() {
     setLoading(true)
@@ -54,6 +55,27 @@ export function JobActions({ jobId, enabled, onToggle }: JobActionsProps) {
     }
   }
 
+  async function handleDelete() {
+    if (!confirm("Are you sure you want to delete this job? This action cannot be undone.")) {
+      return
+    }
+    setDeleting(true)
+    try {
+      const res = await fetch(`/api/jobs/${jobId}`, { method: "DELETE" })
+      if (!res.ok) {
+        toast("Failed to delete job", "error")
+        setDeleting(false)
+        return
+      }
+      toast("Job deleted", "success")
+      router.refresh()
+      router.push("/dashboard")
+    } catch (err) {
+      toast("Failed to delete job", "error")
+      setDeleting(false)
+    }
+  }
+
   return (
     <div className="space-y-3 pt-4">
       <Button
@@ -87,6 +109,15 @@ export function JobActions({ jobId, enabled, onToggle }: JobActionsProps) {
         disabled={duplicating}
       >
         {duplicating ? 'DUPLICATING...' : 'DUPLICATE'}
+      </Button>
+
+      <Button
+        variant="error"
+        className="w-full text-error border-error hover:bg-error/10"
+        onClick={handleDelete}
+        disabled={deleting}
+      >
+        {deleting ? 'DELETING...' : 'DELETE JOB'}
       </Button>
     </div>
   )

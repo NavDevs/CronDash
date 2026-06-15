@@ -17,6 +17,22 @@ export async function executeJob(jobId: string) {
   // Calculate next run time
   const nextRun = getNextRunTime(job.schedule)
 
+  // Prevent concurrent executions by atomically updating the nextRun time.
+  // If another process (like the internal node-cron vs the external /api/cron) 
+  // already updated it for this exact tick, this will return count: 0.
+  const lock = await prisma.job.updateMany({
+    where: { 
+      id: jobId,
+      nextRun: job.nextRun,
+    },
+    data: { nextRun },
+  })
+
+  if (lock.count === 0) {
+    console.log(`[EXECUTOR] Skipping concurrent execution for job ${jobId}`)
+    return
+  }
+
   try {
     const response = await axios({
       method: job.method,
@@ -40,10 +56,10 @@ export async function executeJob(jobId: string) {
       },
     })
 
-    // update lastRun and nextRun on job
+    // update lastRun on job
     await prisma.job.update({
       where: { id: job.id },
-      data: { lastRun: executedAt, nextRun },
+      data: { lastRun: executedAt },
     })
 
   } catch (error: any) {
@@ -64,10 +80,10 @@ export async function executeJob(jobId: string) {
       },
     })
 
-    // update lastRun and nextRun on job
+    // update lastRun on job
     await prisma.job.update({
       where: { id: job.id },
-      data: { lastRun: executedAt, nextRun },
+      data: { lastRun: executedAt },
     })
 
     // Send alerts on failure
