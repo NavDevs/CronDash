@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { scheduleJob } from "@/lib/scheduler"
+import { getNextRunTime } from "@/lib/cron-utils"
 import { requireUserId } from "@/lib/auth"
 
 export async function GET() {
@@ -43,6 +44,7 @@ export async function POST(req: Request) {
         headers: headers ? JSON.stringify(headers) : null,
         body: requestBody ? JSON.stringify(requestBody) : null,
         schedule,
+        nextRun: getNextRunTime(schedule),
         userId,
       },
     })

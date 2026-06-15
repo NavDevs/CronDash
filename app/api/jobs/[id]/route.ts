@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { rescheduleJob, unscheduleJob } from "@/lib/scheduler"
+import { getNextRunTime } from "@/lib/cron-utils"
 import { requireUserId } from "@/lib/auth"
 
 export async function GET(
@@ -35,6 +36,10 @@ export async function PUT(
     const userId = await requireUserId()
     const resolvedParams = await params
     const data = await request.json()
+
+    if (data.schedule) {
+      data.nextRun = getNextRunTime(data.schedule)
+    }
 
     const job = await prisma.job.updateMany({
       where: { id: resolvedParams.id, userId },
