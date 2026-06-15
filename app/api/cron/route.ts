@@ -48,17 +48,23 @@ export async function GET(req: Request) {
       where: { userId: user.id, enabled: true },
     });
 
-    if (jobs.length === 0) {
+    // Filter jobs that are actually due
+    const now = new Date();
+    const dueJobs = jobs.filter((job) => {
+      return !job.nextRun || new Date(job.nextRun) <= now;
+    });
+
+    if (dueJobs.length === 0) {
       return NextResponse.json({
-        message: "No enabled jobs found",
+        message: "No jobs are due for execution at this time",
         executed: 0,
         results: [],
       });
     }
 
-    // Execute all jobs in parallel
+    // Execute due jobs in parallel
     const results = await Promise.allSettled(
-      jobs.map(async (job) => {
+      dueJobs.map(async (job) => {
         const startTime = Date.now();
         try {
           await executeJob(job.id);

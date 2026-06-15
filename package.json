@@ -19,6 +19,7 @@
     "@types/react-dom": "^19",
     "axios": "^1.16.1",
     "bcryptjs": "^3.0.2",
+    "cron-parser": "^5.5.0",
     "eslint": "^9",
     "eslint-config-next": "16.2.6",
     "jose": "^6.0.11",

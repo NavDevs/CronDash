@@ -2,6 +2,8 @@
  * Cron expression validation and utilities
  */
 
+import parser from 'cron-parser'
+
 export interface CronValidationResult {
   valid: boolean
   error?: string
@@ -142,47 +144,12 @@ export function getNextRunTime(expression: string): Date | null {
     return null
   }
 
-  // Simple next occurrence calculation
-  // For production, use a library like 'cron-parser'
-  const now = new Date()
-  const parts = expression.trim().split(/\s+/)
-
-  // This is a simplified version - for complex expressions,
-  // you might want to use 'cron-parser' library
-  
-  // For now, return a rough estimate based on common patterns
-  const [minute, hour] = parts
-
-  const next = new Date(now)
-  
-  // Set to next minute
-  next.setSeconds(0)
-  next.setMilliseconds(0)
-  next.setMinutes(next.getMinutes() + 1)
-
-  // Handle specific minute
-  if (minute !== '*' && !minute.startsWith('*/')) {
-    const targetMin = parseInt(minute)
-    if (!isNaN(targetMin)) {
-      next.setMinutes(targetMin)
-      if (next <= now) {
-        next.setHours(next.getHours() + 1)
-      }
-    }
+  try {
+    const interval = parser.parseExpression(expression)
+    return interval.next().toDate()
+  } catch (err) {
+    return null
   }
-
-  // Handle specific hour
-  if (hour !== '*' && !hour.startsWith('*/')) {
-    const targetHour = parseInt(hour)
-    if (!isNaN(targetHour)) {
-      next.setHours(targetHour)
-      if (next <= now) {
-        next.setDate(next.getDate() + 1)
-      }
-    }
-  }
-
-  return next
 }
 
 /**
