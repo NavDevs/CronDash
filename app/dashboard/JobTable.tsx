@@ -143,12 +143,11 @@ export function JobTable({ jobs }: JobTableProps) {
       </div>
 
       {/* Table header — desktop only */}
-      <div className="hidden md:grid grid-cols-12 gap-x-4 font-mono text-[11px] text-primary/40 uppercase tracking-wider border-b border-border pb-2 px-4">
+      <div className="hidden md:grid grid-cols-10 gap-x-4 font-mono text-[11px] text-primary/40 uppercase tracking-wider border-b border-border pb-2 px-4">
         <div className="col-span-2">Name</div>
         <div className="col-span-2">Schedule</div>
         <div className="col-span-2">Status</div>
         <div className="col-span-2">Last Run</div>
-        <div className="col-span-2">Next Run</div>
         <div className="col-span-2">Target URL</div>
       </div>
 
@@ -182,12 +181,11 @@ export function JobTable({ jobs }: JobTableProps) {
                   <div className="flex flex-wrap gap-4 font-mono text-xs text-primary/60">
                     <span>⏱ {job.schedule}</span>
                     <span suppressHydrationWarning>Last: {mounted ? formatDate(job.lastRun) : "—"}</span>
-                    <span suppressHydrationWarning>Next: {mounted ? formatDate(job.nextRun) : "—"}</span>
                   </div>
                 </div>
 
                 {/* Desktop layout */}
-                <div className="hidden md:grid grid-cols-12 gap-x-4 items-center">
+                <div className="hidden md:grid grid-cols-10 gap-x-4 items-center">
                   <div className="col-span-2">
                     <Link
                       href={`/jobs/${job.id}`}
@@ -205,9 +203,6 @@ export function JobTable({ jobs }: JobTableProps) {
                   </div>
                   <div className="col-span-2 font-mono text-sm text-primary/70" title={mounted && job.lastRun ? new Date(job.lastRun).toLocaleString() : ""} suppressHydrationWarning>
                     {mounted ? formatDate(job.lastRun) : "—"}
-                  </div>
-                  <div className="col-span-2 font-mono text-sm text-primary/70" title={mounted && job.nextRun ? new Date(job.nextRun).toLocaleString() : ""} suppressHydrationWarning>
-                    {mounted ? formatDate(job.nextRun) : "—"}
                   </div>
                   <div className="col-span-2 font-mono text-xs text-primary/50 truncate" title={job.url}>
                     <a href={job.url} target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">

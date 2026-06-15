@@ -119,12 +119,6 @@ export default async function JobDetailPage({
             <Card title="SCHEDULE INFO">
               <div className="space-y-3 font-mono text-sm">
                 <div className="flex justify-between">
-                  <span className="text-primary">NEXT RUN:</span>
-                  <span className="text-primary">
-                    <LocalTime date={job.nextRun} />
-                  </span>
-                </div>
-                <div className="flex justify-between">
                   <span className="text-primary">LAST RUN:</span>
                   <span className="text-primary">
                     <LocalTime date={job.lastRun} />
