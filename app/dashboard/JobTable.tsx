@@ -66,6 +66,11 @@ export function JobTable({ jobs }: JobTableProps) {
   const [page, setPage] = useState(0);
   const [autoRefresh, setAutoRefresh] = useState(true);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const filtered = useMemo(() => {
     return jobs.filter((job) => {
@@ -176,8 +181,8 @@ export function JobTable({ jobs }: JobTableProps) {
                   </div>
                   <div className="flex flex-wrap gap-4 font-mono text-xs text-primary/60">
                     <span>⏱ {job.schedule}</span>
-                    <span>Last: {formatDate(job.lastRun)}</span>
-                    <span>Next: {formatDate(job.nextRun)}</span>
+                    <span suppressHydrationWarning>Last: {mounted ? formatDate(job.lastRun) : "—"}</span>
+                    <span suppressHydrationWarning>Next: {mounted ? formatDate(job.nextRun) : "—"}</span>
                   </div>
                 </div>
 
@@ -198,11 +203,11 @@ export function JobTable({ jobs }: JobTableProps) {
                   <div className="col-span-2">
                     <StatusBadge enabled={job.enabled} lastStatus={lastStatus} />
                   </div>
-                  <div className="col-span-2 font-mono text-sm text-primary/70" title={job.lastRun ? new Date(job.lastRun).toLocaleString() : ""} suppressHydrationWarning>
-                    {formatDate(job.lastRun)}
+                  <div className="col-span-2 font-mono text-sm text-primary/70" title={mounted && job.lastRun ? new Date(job.lastRun).toLocaleString() : ""} suppressHydrationWarning>
+                    {mounted ? formatDate(job.lastRun) : "—"}
                   </div>
-                  <div className="col-span-2 font-mono text-sm text-primary/70" title={job.nextRun ? new Date(job.nextRun).toLocaleString() : ""} suppressHydrationWarning>
-                    {formatDate(job.nextRun)}
+                  <div className="col-span-2 font-mono text-sm text-primary/70" title={mounted && job.nextRun ? new Date(job.nextRun).toLocaleString() : ""} suppressHydrationWarning>
+                    {mounted ? formatDate(job.nextRun) : "—"}
                   </div>
                   <div className="col-span-2 font-mono text-xs text-primary/50 truncate" title={job.url}>
                     <a href={job.url} target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">

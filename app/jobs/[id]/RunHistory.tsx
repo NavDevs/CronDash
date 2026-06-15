@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { LogModal } from "@/components/LogModal";
+import { LocalTime } from "@/components/LocalTime";
 
 interface Run {
   id: string;
@@ -63,8 +64,8 @@ export function RunHistory({ runs }: { runs: Run[] }) {
               key={run.id}
               className="grid grid-cols-5 gap-4 font-mono text-sm items-center border-b border-border py-2 hover:bg-muted/10 transition-colors"
             >
-              <div className="text-primary" suppressHydrationWarning>
-                {new Date(run.executedAt).toLocaleString()}
+              <div className="text-primary">
+                <LocalTime date={run.executedAt} />
               </div>
               <div
                 className={

@@ -7,6 +7,7 @@ import { StatusIndicator } from "@/components/ui/StatusIndicator"
 import { ProfileMenu } from "@/components/ui/ProfileMenu"
 import { JobActions } from "./JobActions"
 import { RunHistory } from "./RunHistory"
+import { LocalTime } from "@/components/LocalTime"
 
 export const dynamic = "force-dynamic"
 
@@ -119,14 +120,14 @@ export default async function JobDetailPage({
               <div className="space-y-3 font-mono text-sm">
                 <div className="flex justify-between">
                   <span className="text-primary">NEXT RUN:</span>
-                  <span className="text-primary" suppressHydrationWarning>
-                    {job.nextRun ? new Date(job.nextRun).toLocaleString() : "N/A"}
+                  <span className="text-primary">
+                    <LocalTime date={job.nextRun} />
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-primary">LAST RUN:</span>
-                  <span className="text-primary" suppressHydrationWarning>
-                    {job.lastRun ? new Date(job.lastRun).toLocaleString() : "N/A"}
+                  <span className="text-primary">
+                    <LocalTime date={job.lastRun} />
                   </span>
                 </div>
                 <JobActions jobId={job.id} enabled={job.enabled} />
