@@ -198,10 +198,10 @@ export function JobTable({ jobs }: JobTableProps) {
                   <div className="col-span-2">
                     <StatusBadge enabled={job.enabled} lastStatus={lastStatus} />
                   </div>
-                  <div className="col-span-2 font-mono text-sm text-primary/70" title={job.lastRun ? new Date(job.lastRun).toLocaleString() : ""}>
+                  <div className="col-span-2 font-mono text-sm text-primary/70" title={job.lastRun ? new Date(job.lastRun).toLocaleString() : ""} suppressHydrationWarning>
                     {formatDate(job.lastRun)}
                   </div>
-                  <div className="col-span-2 font-mono text-sm text-primary/70" title={job.nextRun ? new Date(job.nextRun).toLocaleString() : ""}>
+                  <div className="col-span-2 font-mono text-sm text-primary/70" title={job.nextRun ? new Date(job.nextRun).toLocaleString() : ""} suppressHydrationWarning>
                     {formatDate(job.nextRun)}
                   </div>
                   <div className="col-span-2 font-mono text-xs text-primary/50 truncate" title={job.url}>

@@ -119,13 +119,13 @@ export default async function JobDetailPage({
               <div className="space-y-3 font-mono text-sm">
                 <div className="flex justify-between">
                   <span className="text-primary">NEXT RUN:</span>
-                  <span className="text-primary">
+                  <span className="text-primary" suppressHydrationWarning>
                     {job.nextRun ? new Date(job.nextRun).toLocaleString() : "N/A"}
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-primary">LAST RUN:</span>
-                  <span className="text-primary">
+                  <span className="text-primary" suppressHydrationWarning>
                     {job.lastRun ? new Date(job.lastRun).toLocaleString() : "N/A"}
                   </span>
                 </div>

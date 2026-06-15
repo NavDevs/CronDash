@@ -49,9 +49,11 @@ export async function GET(req: Request) {
     });
 
     // Filter jobs that are actually due
-    const now = new Date();
+    // We add a 60-second buffer because external services like cron-job.org might ping slightly early
+    const now = Date.now();
+    const buffer = 60000; // 60 seconds
     const dueJobs = jobs.filter((job) => {
-      return !job.nextRun || new Date(job.nextRun) <= now;
+      return !job.nextRun || new Date(job.nextRun).getTime() <= now + buffer;
     });
 
     if (dueJobs.length === 0) {

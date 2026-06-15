@@ -63,7 +63,7 @@ export function RunHistory({ runs }: { runs: Run[] }) {
               key={run.id}
               className="grid grid-cols-5 gap-4 font-mono text-sm items-center border-b border-border py-2 hover:bg-muted/10 transition-colors"
             >
-              <div className="text-primary">
+              <div className="text-primary" suppressHydrationWarning>
                 {new Date(run.executedAt).toLocaleString()}
               </div>
               <div
