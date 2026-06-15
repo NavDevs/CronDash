@@ -145,7 +145,7 @@ export function getNextRunTime(expression: string): Date | null {
   }
 
   try {
-    const interval = parser.parseExpression(expression)
+    const interval = parser.parse(expression)
     return interval.next().toDate()
   } catch (err) {
     return null
