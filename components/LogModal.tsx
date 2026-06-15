@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { Button } from "@/components/ui/Button"
+import { LocalTime } from "@/components/LocalTime"
 
 type Run = {
   id: string
@@ -59,7 +60,7 @@ export function LogModal({ run }: { run: Run }) {
             {/* meta info */}
             <div className="mb-4 text-sm space-y-2">
               <p className="text-primary m-0">
-                TIMESTAMP: {new Date(run.executedAt).toLocaleString()}
+                TIMESTAMP: <LocalTime date={run.executedAt} />
               </p>
               <p className={`m-0 ${run.status === "success" ? "text-primary" : "text-error"}`}>
                 STATUS: [{run.status === "success" ? "OK" : "ERR"}]
@@ -86,6 +87,19 @@ export function LogModal({ run }: { run: Run }) {
             `}>
               {formatResponse()}
             </pre>
+
+            {/* 404 helper tip */}
+            {run.statusCode === 404 && (
+              <div className="mt-4 border border-primary/40 bg-primary/5 p-3 text-xs text-primary/90">
+                <p className="font-semibold mb-2">[TIP] Your server returned a 404 Not Found error.</p>
+                <p className="mb-2">If you are just pinging your server to keep it awake, this still works! However, to get a green [OK], add a route to your server for this URL. For example, in Express:</p>
+                <pre className="bg-background/80 border border-primary/20 p-2 overflow-x-auto m-0 text-primary/80">
+{`app.get('/', (req, res) => {
+  res.status(200).send('Server is awake!');
+});`}
+                </pre>
+              </div>
+            )}
           </div>
         </div>
       )}
