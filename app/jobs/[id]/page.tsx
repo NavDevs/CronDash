@@ -13,8 +13,9 @@ export const dynamic = "force-dynamic"
 export default async function JobDetailPage({
   params,
 }: {
-  params: { id: string }
+  params: Promise<{ id: string }>
 }) {
+  const resolvedParams = await params;
   let userId: string
   try {
     userId = await requireUserId()
@@ -23,7 +24,7 @@ export default async function JobDetailPage({
   }
 
   const job = await prisma.job.findFirst({
-    where: { id: params.id, userId },
+    where: { id: resolvedParams.id, userId },
     include: { runs: { orderBy: { executedAt: "desc" }, take: 50 } },
   })
 
