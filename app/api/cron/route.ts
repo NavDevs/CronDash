@@ -64,50 +64,17 @@ export async function GET(req: Request) {
       });
     }
 
-    // Execute due jobs in parallel
-    const results = await Promise.allSettled(
-      dueJobs.map(async (job) => {
-        const startTime = Date.now();
-        try {
-          await executeJob(job.id);
-          return {
-            jobId: job.id,
-            jobName: job.name,
-            status: "success",
-            duration: Date.now() - startTime,
-          };
-        } catch (error: any) {
-          return {
-            jobId: job.id,
-            jobName: job.name,
-            status: "failed",
-            error: error.message,
-            duration: Date.now() - startTime,
-          };
-        }
-      })
-    );
-
-    // Summarize results
-    const summary = results.map((result) => {
-      if (result.status === "fulfilled") {
-        return result.value;
-      }
-      return {
-        status: "error",
-        error: result.reason?.message || "Unknown error",
-      };
-    });
-
-    const successCount = summary.filter((r) => r.status === "success").length;
-    const failedCount = summary.filter((r) => r.status === "failed").length;
+    // Execute due jobs in the background (asynchronously)
+    // We do NOT await this because if jobs take too long, the external
+    // cron service (like cron-job.org) will timeout and report an error.
+    Promise.allSettled(
+      dueJobs.map((job) => executeJob(job.id))
+    ).catch(console.error);
 
     return NextResponse.json({
-      executed: jobs.length,
-      success: successCount,
-      failed: failedCount,
+      message: "Jobs triggered successfully in the background",
+      executed: dueJobs.length,
       timestamp: new Date().toISOString(),
-      results: summary,
     });
   } catch (error: any) {
     console.error("[CRON] External trigger error:", error);
