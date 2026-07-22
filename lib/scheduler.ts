@@ -52,23 +52,29 @@ export async function initScheduler() {
 
   console.log("[SCHEDULER] Initializing...")
 
-  const jobs = await prisma.job.findMany({
-    where: { enabled: true },
-  })
+  try {
+    const jobs = await prisma.job.findMany({
+      where: { enabled: true },
+    })
 
-  for (const job of jobs) {
-    scheduleJob(job.id, job.schedule)
-    const nextRun = getNextRunTime(job.schedule)
-    if (nextRun) {
-      await prisma.job.update({
-        where: { id: job.id },
-        data: { nextRun },
-      }).catch(() => {})
+    for (const job of jobs) {
+      scheduleJob(job.id, job.schedule)
+      const nextRun = getNextRunTime(job.schedule)
+      if (nextRun) {
+        await prisma.job.update({
+          where: { id: job.id },
+          data: { nextRun },
+        }).catch(() => {})
+      }
     }
-  }
 
-  console.log(`[SCHEDULER] Loaded ${jobs.length} jobs`)
+    console.log(`[SCHEDULER] Loaded ${jobs.length} jobs`)
+  } catch (error) {
+    console.error("[SCHEDULER] Failed to initialize (DB might be asleep):", error)
+    // We set initialized back to false so it can retry later if needed
+    initialized = false
+  }
 }
 
 // Auto-initialize on module load (fires when server starts)
-initScheduler()
+initScheduler().catch(console.error)
