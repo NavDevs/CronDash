@@ -8,8 +8,7 @@
 ![Tailwind](https://img.shields.io/badge/Tailwind-4-38bdf8)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Neon-4169E1)
 ![Deploy](https://img.shields.io/badge/Deploy-Render-46E3B7)
-
-🔗 **Live Demo**: [https://cron-dash.onrender.com](https://cron-dash.onrender.com)
+🔗 **Live Demo**: [https://crondash-18xd.onrender.com](https://crondash-18xd.onrender.com)
 
 ---
 
