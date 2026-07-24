@@ -61,7 +61,7 @@ export default function SignupPage() {
       }
 
       toast('Account created successfully', 'success');
-      router.push('/dashboard');
+      window.location.href = '/dashboard';
     } catch {
       setError('Something went wrong');
       setLoading(false);

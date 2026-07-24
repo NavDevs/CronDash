@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { hashPassword, setSessionCookie } from '@/lib/auth';
+import { hashPassword, createSessionToken } from '@/lib/auth';
 
 function getOrigin(request: NextRequest): string {
   const proto = request.headers.get('x-forwarded-proto') || 'http';
@@ -88,11 +88,19 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    // Set session cookie (same as email/password login)
-    await setSessionCookie({ userId: user.id, email: user.email });
-
-    // Clear the CSRF state cookie and redirect to dashboard
+    // Set session cookie directly on the response object
+    const token = await createSessionToken({ userId: user.id, email: user.email });
     const response = NextResponse.redirect(`${origin}/dashboard`);
+    
+    response.cookies.set('crondash-session', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 60 * 60 * 24 * 7, // 7 days
+    });
+    
+    // Clear the CSRF state cookie
     response.cookies.set('oauth_state', '', { maxAge: 0, path: '/' });
     return response;
   } catch (err) {
