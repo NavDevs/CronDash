@@ -85,3 +85,16 @@ body {
   80% { transform: translate(2px, -2px); }
   100% { transform: translate(0); }
 }
+
+/* Hand pointing pointer cursor for all buttons & links */
+button,
+a,
+input[type="button"],
+input[type="submit"],
+input[type="reset"],
+input[type="checkbox"],
+input[type="radio"],
+select,
+[role="button"] {
+  cursor: pointer !important;
+}
