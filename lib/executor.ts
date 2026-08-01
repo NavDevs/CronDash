@@ -37,7 +37,10 @@ export async function executeJob(jobId: string) {
     const response = await axios({
       method: job.method,
       url: job.url,
-      headers: job.headers ? JSON.parse(job.headers) : {},
+      headers: {
+        "User-Agent": "CronDash/1.0",
+        ...(job.headers ? JSON.parse(job.headers) : {}),
+      },
       data: job.body || undefined,
       timeout: 120000, // 120 second timeout to allow free-tier servers to wake up
     })
