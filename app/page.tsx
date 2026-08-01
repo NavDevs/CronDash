@@ -20,14 +20,23 @@ export default function Home() {
     'YOUR TERMINAL FOR CRON JOBS',
   ];
 
-  // Check auth status
+  // Check auth status with safety timeout
   useEffect(() => {
-    fetch('/api/auth/me')
+    const controller = new AbortController();
+    const timer = setTimeout(() => {
+      controller.abort();
+      setIsSignedIn((prev) => (prev === null ? false : prev));
+    }, 2000);
+
+    fetch('/api/auth/me', { signal: controller.signal })
       .then((res) => {
         setIsSignedIn(res.ok);
       })
       .catch(() => {
         setIsSignedIn(false);
+      })
+      .finally(() => {
+        clearTimeout(timer);
       });
   }, []);
 
