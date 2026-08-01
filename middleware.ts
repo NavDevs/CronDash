@@ -7,6 +7,8 @@ const publicPaths = [
   '/',
   '/login',
   '/signup',
+  '/demo',
+  '/api/demo-target',
   '/api/auth/login',
   '/api/auth/register',
   '/api/auth/logout',
@@ -14,6 +16,8 @@ const publicPaths = [
   '/api/auth/callback/google',
   '/api/cron',
   '/api/test',
+  '/api/ping',
+  '/api/health',
 ];
 
 function isPublicPath(pathname: string): boolean {
