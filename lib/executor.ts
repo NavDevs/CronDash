@@ -38,7 +38,7 @@ export async function executeJob(jobId: string) {
       method: job.method,
       url: job.url,
       headers: {
-        "User-Agent": "CronDash/1.0",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36 CronDash/1.0",
         ...(job.headers ? JSON.parse(job.headers) : {}),
       },
       data: job.body || undefined,
