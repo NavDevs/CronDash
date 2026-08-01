@@ -97,7 +97,7 @@ export function JobTable({ jobs }: JobTableProps) {
 
   useEffect(() => {
     if (!autoRefresh) return;
-    intervalRef.current = setInterval(() => router.refresh(), 30000);
+    intervalRef.current = setInterval(() => router.refresh(), 4000);
     return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
   }, [autoRefresh, router]);
 

@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { LogModal } from "@/components/LogModal";
 import { LocalTime } from "@/components/LocalTime";
 
@@ -18,7 +19,15 @@ const inputClass =
   "bg-transparent border border-border text-primary font-mono outline-none focus:border-primary transition-colors px-3 py-2 text-sm";
 
 export function RunHistory({ runs }: { runs: Run[] }) {
+  const router = useRouter();
   const [filter, setFilter] = useState<string>("all");
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      router.refresh();
+    }, 4000);
+    return () => clearInterval(timer);
+  }, [router]);
 
   const filtered = runs.filter(
     (run) => filter === "all" || run.status === filter
